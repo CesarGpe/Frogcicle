@@ -88,6 +88,9 @@ function love.keypressed(key, scancode, isrepeat)
 	end
 end
 
+local elapsed = 0
+local fixed_step = 1 / 60
+
 function love.update(dt)
 	mouseX, mouseY = push:toGame(love.mouse.getPosition())
 	--skew_shader:send("time", love.timer.getTime())
@@ -102,7 +105,7 @@ function love.update(dt)
 			if #cons ~= 0 then
 				for _, c in pairs(cons) do
 					local a, b = c:getFixtures()
-					for _, f in pairs({a, b}) do
+					for _, f in pairs({ a, b }) do
 						if f:getCategory() == collision_masks.enemy then
 							f:getUserData():freeze()
 							break
@@ -129,8 +132,14 @@ function love.update(dt)
 	end
 
 	timers.miscUpdate(dt)
-	world:update(dt)
+	--world:update(dt)
 	sounds.update()
+
+	elapsed = elapsed + dt
+	while elapsed > fixed_step do
+		world:update(dt)
+		elapsed = elapsed - fixed_step
+	end
 end
 
 local dproj_sprite = love.graphics.newImage("sprites/ice-break.png")
@@ -158,7 +167,8 @@ function love.draw()
 		if not p.body:isDestroyed() then
 			table.insert(entities, p)
 		else
-			love.graphics.draw(dproj_sprite, p.x, p.y, 0, 1.35, 1.35, dproj_sprite:getWidth()/2, dproj_sprite:getHeight()/2)
+			love.graphics.draw(dproj_sprite, p.x, p.y, 0, 1.35, 1.35, dproj_sprite:getWidth() / 2,
+				dproj_sprite:getHeight() / 2)
 		end
 	end
 	table.sort(entities, function(a, b)
@@ -202,6 +212,8 @@ function love.draw()
 		love.graphics.print("Press anywhere to start!", 345, 380, 0, 0.5, 0.5)
 		love.graphics.setShader()
 	end
+
+	love.graphics.print(love.timer.getFPS(), 10, 10)
 
 	push:finish()
 end
