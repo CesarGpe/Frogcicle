@@ -132,14 +132,8 @@ function love.update(dt)
 	end
 
 	timers.miscUpdate(dt)
-	--world:update(dt)
+	world:update(dt)
 	sounds.update()
-
-	elapsed = elapsed + dt
-	while elapsed > fixed_step do
-		world:update(dt)
-		elapsed = elapsed - fixed_step
-	end
 end
 
 local dproj_sprite = love.graphics.newImage("sprites/ice-break.png")
