@@ -1,16 +1,7 @@
-extern number time;
-        extern number frequency = 10.0;
-        extern number amplitude = 5.0;
+//extern vec2 screen;
 
-        vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
-        {
-            // Calculate the wave offset
-            float wave = sin(texture_coords.x * frequency + time) * amplitude;
-
-            // Apply the wave to the Y coordinate
-            texture_coords.y += wave;
-
-            // Sample the texture and return the final color
-            vec4 texColor = Texel(tex, texture_coords);
-            return texColor * color;
-        }
+vec4 effect(vec4 color, Image image, vec2 uvs, vec2 screen_coords)
+{
+    vec4 pixel = Texel(image, uvs);
+    return pixel * color;
+}

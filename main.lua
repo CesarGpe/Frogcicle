@@ -7,6 +7,8 @@ in_trans = false
 game_active = false
 difficulty = 1
 
+game_timers = {}
+
 world = love.physics.newWorld()
 push = require("libs.push")
 
@@ -17,24 +19,6 @@ collision_masks = {
 	projectile = 8,
 }
 
-local skew_shader = love.graphics.newShader([[
-        extern number time;
-        extern number frequency = 10.0;
-        extern number amplitude = 5.0;
-
-        vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
-        {
-            // Calculate the wave offset
-            float wave = sin(texture_coords.x * frequency + time) * amplitude;
-
-            // Apply the wave to the Y coordinate
-            texture_coords.y += wave;
-
-            // Sample the texture and return the final color
-            vec4 texColor = Texel(tex, texture_coords);
-            return texColor * color;
-        }
-]])
 local skew_shader = love.graphics.newShader("shader/skew.fs")
 
 local lume = require("libs.lume")
@@ -70,8 +54,10 @@ function love.load()
 	player.load()
 end
 
+local clicked = false
 function love.mousepressed(x, y, button, istouch, presses)
-	if not game_active then
+	if not game_active and not clicked then
+		clicked = true
 		sounds.intro()
 		sounds.stop_menu_music()
 		timers.oneshot(1.38, function()
@@ -104,7 +90,8 @@ end
 
 function love.update(dt)
 	mouseX, mouseY = push:toGame(love.mouse.getPosition())
-	skew_shader:send("time", love.timer.getTime())
+	--skew_shader:send("time", love.timer.getTime())
+	--skew_shader:send("screen", {WIDTH, HEIGHT})
 
 	player.update(dt)
 

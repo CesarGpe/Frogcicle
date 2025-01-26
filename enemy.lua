@@ -15,7 +15,7 @@ function newEnemy(x, y)
 		jump_delay = 1,  -- the delay between the turn and the jump
 		jump_length = 0.38, -- time in the air when it jumps
 		jump_randomness = 0.5, -- variance of time between jumps
-		jump_strength = 5000,
+		jump_strength = 60,
 		ice = love.graphics.newImage("sprites/frozen.png"),
 		sprite = love.graphics.newImage("sprites/suwako-sheet.png"),
 		shadow = love.graphics.newImage("sprites/suwako-shadow.png"),
@@ -33,6 +33,7 @@ function newEnemy(x, y)
 		dying = false,
 		die_timer = {},
 		die_anim_timer = {},
+		die_blink = false,
 
 		load = function(self)
 			self.animations, self.anim = suwakoAnims(self.sprite)
@@ -59,26 +60,32 @@ function newEnemy(x, y)
 		end,
 
 		draw = function(self)
-			self.anim:draw(self.sprite, self.x, self.y, 0, self.scale, self.scale)
 			if self.frozen then
+				love.graphics.setColor(0.7, 0.7, 1, 1)
+				self.anim:draw(self.sprite, self.x, self.y, 0, self.scale, self.scale)
 				love.graphics.setColor(1, 1, 1, 0.5)
 				love.graphics.draw(self.ice, self.x - 4, self.y - 4, 0, self.scale - 0.2, self.scale - 0.2)
 				love.graphics.setColor(1, 1, 1, 1)
+			elseif not self.die_blink then
+				love.graphics.setColor(1, 1, 1, 1)
+				self.anim:draw(self.sprite, self.x, self.y, 0, self.scale, self.scale)
 			end
 		end,
 
 		update = function(self, dt)
 			if self.frozen then
-				if not self.freeze_timer.isExpired() then
-					self.freeze_timer.update(dt)
-				end
+				if not self.freeze_timer.isExpired() then self.freeze_timer.update(dt) end
 			elseif self.dying then
 				if not self.die_timer.isExpired() then self.die_timer.update(dt) end
-				--if not self.die_anim_timer.isExpired() then self.die_anim_timer.update(dt) end
+				if not self.die_anim_timer.isExpired() then self.die_anim_timer.update(dt) end
 			else
 				for _, t in pairs(self.timings) do
 					if not t.isExpired() then t.update(dt) end
 				end
+			end
+
+			if self.anim == self.animations.dead then
+				self.die_blink = not self.die_blink
 			end
 
 			if self.body:isDestroyed() then
@@ -130,7 +137,7 @@ function newEnemy(x, y)
 			end
 
 			table.insert(self.timings, timers.new(self.jump_delay, function()
-				self.body:applyForce(self.jump_strength * mx, self.jump_strength * my)
+				self.body:applyLinearImpulse(self.jump_strength * mx, self.jump_strength * my)
 				sounds.leap()
 
 				if mx > -margin and mx < margin and my < 0 then
@@ -188,7 +195,11 @@ function newEnemy(x, y)
 		destroy = function(self)
 			self.dying = true
 			self.anim = self.animations.shocked
-			self.die_timer = timers.new(1.9, function()
+			self.die_anim_timer = timers.new(1, function()
+				self.anim = self.animations.dead
+				self.die_blink = true
+			end)
+			self.die_timer = timers.new(2, function()
 				self.fixture:destroy()
 				self.shape = nil
 				self.body:destroy()
@@ -217,8 +228,8 @@ function suwakoAnims(sprite)
 	animations.left_jump = anim8.newAnimation(grid("2-2", 7), 0.2)
 	animations.up_left = anim8.newAnimation(grid("1-1", 8), 0.2)
 	animations.up_left_jump = anim8.newAnimation(grid("2-2", 8), 0.2)
-	--animations.shocked = anim8.newAnimation(grid("1-1", 9), 0.2)
-	animations.shocked = anim8.newAnimation(grid("1-2", 9), 1, false)
+	animations.shocked = anim8.newAnimation(grid("1-1", 9), 1)
+	animations.dead = anim8.newAnimation(grid("2-2", 9), 1)
 	anim = animations.down
 
 	return animations, anim
