@@ -1,5 +1,4 @@
 local anim8 = require("libs.anim8")
-enemies = {}
 
 function newEnemy(x, y)
 	return {
@@ -33,13 +32,15 @@ function newEnemy(x, y)
 		dying = false,
 		die_timer = {},
 		die_anim_timer = {},
-		die_blink = false,
+		blinking = false,
+		blink_timer = {},
 
 		load = function(self)
 			self.animations, self.anim = suwakoAnims(self.sprite)
 			self.shanimations, self.shanim = suwakoAnims(self.shadow)
 
 			self.body = love.physics.newBody(world, self.x, self.y, "dynamic")
+			self.body:setLinearDamping(self.friction)
 			self.body:setFixedRotation(true)
 			self.shape = love.physics.newCircleShape(self.radius)
 			self.fixture = love.physics.newFixture(self.body, self.shape)
@@ -48,15 +49,16 @@ function newEnemy(x, y)
 
 			self.jump_time = self.jump_time + (love.math.random() * 2 - 1)
 			table.insert(self.timings, timers.new(self.jump_time, function() self:jump() end))
-			table.insert(self.timings, timers.new(self.life_span * difficulty, function() self:destroy() end))
+			table.insert(self.timings, timers.new(self.life_span, function() self:destroy() end))
 
-			table.insert(enemies, self)
 			self.fixture:setUserData(self)
 		end,
 
 		draw_shadow = function(self)
-			self.shanim = self.anim
-			self.shanim:draw(self.shadow, self.x, self.y, 0, self.scale, self.scale)
+			if not self.blinking or (self.blink_timer and math.floor(self.blink_timer.getTime() * 10) % 2 == 0) then
+				self.shanim = self.anim
+				self.shanim:draw(self.shadow, self.x, self.y, 0, self.scale, self.scale)
+			end
 		end,
 
 		draw = function(self)
@@ -66,7 +68,7 @@ function newEnemy(x, y)
 				love.graphics.setColor(1, 1, 1, 0.5)
 				love.graphics.draw(self.ice, self.x - 4, self.y - 4, 0, self.scale - 0.2, self.scale - 0.2)
 				love.graphics.setColor(1, 1, 1, 1)
-			elseif not self.die_blink then
+			elseif not self.blinking or (self.blink_timer and math.floor(self.blink_timer.getTime() * 10) % 2 == 0) then
 				love.graphics.setColor(1, 1, 1, 1)
 				self.anim:draw(self.sprite, self.x, self.y, 0, self.scale, self.scale)
 			end
@@ -78,14 +80,14 @@ function newEnemy(x, y)
 			elseif self.dying then
 				if not self.die_timer.isExpired() then self.die_timer.update(dt) end
 				if not self.die_anim_timer.isExpired() then self.die_anim_timer.update(dt) end
+
+				if self.blinking and not self.blink_timer.isExpired() then
+					self.blink_timer.update(dt)
+				end
 			else
 				for _, t in pairs(self.timings) do
 					if not t.isExpired() then t.update(dt) end
 				end
-			end
-
-			if self.anim == self.animations.dead then
-				self.die_blink = not self.die_blink
 			end
 
 			if self.body:isDestroyed() then
@@ -94,10 +96,6 @@ function newEnemy(x, y)
 
 			self.x = self.body:getX() - self.offsetx
 			self.y = self.body:getY() - self.offsety
-
-			local velx, vely = self.body:getLinearVelocity()
-			self.body:setLinearVelocity(velx * (1 - math.min(dt * self.friction, 1)),
-				vely * (1 - math.min(dt * self.friction, 1)))
 
 			self.anim:update(dt)
 		end,
@@ -185,7 +183,7 @@ function newEnemy(x, y)
 				sounds.freeze()
 			end
 			self.frozen = true
-			self.freeze_timer = timers.new(self.ice_time - (difficulty - 1), function()
+			self.freeze_timer = timers.new(self.ice_time, function()
 				self.frozen = false
 				sounds.defreeze()
 				sounds.df_chime()
@@ -195,9 +193,10 @@ function newEnemy(x, y)
 		destroy = function(self)
 			self.dying = true
 			self.anim = self.animations.shocked
-			self.die_anim_timer = timers.new(1, function()
+			self.die_anim_timer = timers.new(0.6, function()
 				self.anim = self.animations.dead
-				self.die_blink = true
+				self.blinking = true
+				self.blink_timer = timers.new(1.4)
 			end)
 			self.die_timer = timers.new(2, function()
 				self.fixture:destroy()

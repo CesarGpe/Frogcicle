@@ -1,30 +1,22 @@
+require("globals")
 require("sounds")
 require("player")
-require("enemy")
 require("timer")
 
-in_trans = false
-game_active = false
-difficulty = 1
+--local shader = love.graphics.newShader("shader/test.fs")
 
-game_timers = {}
+local enemy_manager = require("enemy_manager")
 
-world = love.physics.newWorld()
-push = require("libs.push")
-
-collision_masks = {
-	player = 1,
-	enemy = 2,
-	wall = 4,
-	projectile = 8,
-}
-
-local skew_shader = love.graphics.newShader("shader/skew.fs")
-
+----==== USER CONFIG ====----
 local lume = require("libs.lume")
 local savefile = "savedata.txt"
-local debug = false
-local bigger = false
+local config = {
+	debug = false,
+	bigger = false
+}
+
+----==== SPRITES ====----
+local paintbasic = love.graphics.newFont("font/paintbasic.txt", "font/paintbasic.png")
 
 local house = love.graphics.newImage("sprites/house.png")
 local housex = WIDTH / 2 - house:getWidth() / 2
@@ -32,14 +24,12 @@ local housey = HEIGHT / 2 - house:getHeight() / 2
 
 local title = love.graphics.newImage("sprites/title.png")
 local titlex = WIDTH / 2 - title:getWidth() / 2
-local titley = HEIGHT / 4 - title:getHeight() / 2
+local titley = HEIGHT / 3.3 - title:getHeight() / 2
 
-local font = love.graphics.newFont("font/nicopaint.ttf", 40, "mono", 1)
 
 function love.load()
 	love.graphics.setDefaultFilter("nearest", "nearest", 1)
-	love.graphics.setFont(font)
-	font:setFilter("nearest")
+	paintbasic:setFilter("nearest")
 
 	loadData()
 	setupScreen()
@@ -56,47 +46,59 @@ end
 
 local clicked = false
 function love.mousepressed(x, y, button, istouch, presses)
-	if not game_active and not clicked then
+	if not game.active and not clicked then
 		clicked = true
 		sounds.intro()
 		sounds.stop_menu_music()
+		game.transitioning = true
 		timers.oneshot(1.38, function()
+			enemy_manager:init()
 			sounds.game_music()
-			game_active = true
+			game.score = 0
+			game.active = true
+			game.transitioning = false
 		end)
 	end
 end
 
 function love.keypressed(key, scancode, isrepeat)
 	if key == "f11" then
-		bigger = not bigger
+		config.bigger = not config.bigger
 		saveData()
 		setupScreen()
 	end
 
-	if key == "f1" then
-		debug = not debug
+	if key == "-" then
+		config.debug = not config.debug
 		saveData()
 	end
-	if key == "e" and debug then
-		spawnEnemy()
+	if key == "e" and config.debug then
+		enemy_manager:debug_spawn()
 	end
-	if key == "r" and debug then
-		for i = #enemies, 1, -1 do
-			enemies[i]:destroy()
-		end
+	if key == "r" and config.debug then
+		enemy_manager:kill_everyone()
 	end
 end
 
-local elapsed = 0
-local fixed_step = 1 / 60
-
 function love.update(dt)
 	mouseX, mouseY = push:toGame(love.mouse.getPosition())
-	--skew_shader:send("time", love.timer.getTime())
-	--skew_shader:send("screen", {WIDTH, HEIGHT})
+	--shader:send("screen_size", {WIDTH, HEIGHT})
+
+	if game.active then
+		game.difficulty = game.difficulty + dt * 0.001
+		if game.time_left > 1  then
+			local time_change = dt * (1 - game.frozen_enemies * 0.1) * (1 + game.difficulty)
+			if game.frozen_enemies > 4 then time_change = -time_change end
+			game.time_left = game.time_left - time_change
+		else
+			-- matar
+		end
+	end
 
 	player.update(dt)
+	enemy_manager:update(dt + game.difficulty * 0.001)
+
+	game.score = game.score + dt * math.pow(game.frozen_enemies, 1.01)
 
 	for i = #projectiles, 1, -1 do
 		local p = projectiles[i]
@@ -122,18 +124,9 @@ function love.update(dt)
 		end
 	end
 
-	for i = #enemies, 1, -1 do
-		local e = enemies[i]
-		if not e.body:isDestroyed() then
-			e:update(dt)
-		else
-			table.remove(enemies, i)
-		end
-	end
-
 	timers.miscUpdate(dt)
-	world:update(dt)
 	sounds.update()
+	world:update(dt)
 end
 
 local dproj_sprite = love.graphics.newImage("sprites/ice-break.png")
@@ -145,14 +138,14 @@ function love.draw()
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.draw(house, housex, housey)
 
-	for _, e in pairs(enemies) do
+	for _, e in pairs(enemy_manager.enemies) do
 		e:draw_shadow()
 	end
 	player.draw_shadow()
 
 	local entities = {}
 	table.insert(entities, player)
-	for _, e in pairs(enemies) do
+	for _, e in pairs(enemy_manager.enemies) do
 		if not e.body:isDestroyed() then
 			table.insert(entities, e)
 		end
@@ -174,7 +167,7 @@ function love.draw()
 		e:draw()
 	end
 
-	if debug then
+	if config.debug then
 		love.graphics.setColor(1, 1, 1, 0.25)
 		love.graphics.rectangle("fill", 280, 127, 400, 302)
 		for _, body in pairs(world:getBodies()) do
@@ -200,14 +193,36 @@ function love.draw()
 		love.graphics.setColor(1, 1, 1, 1)
 	end
 
-	if not game_active then
-		love.graphics.setShader(skew_shader)
-		love.graphics.draw(title, titlex + 2, titley)
-		love.graphics.print("Press anywhere to start!", 345, 380, 0, 0.5, 0.5)
-		love.graphics.setShader()
-	end
+	if game.active then
+		love.graphics.setColor(1, 1, 1, 1)
+		love.graphics.setFont(paintbasic)
+		local score = math.floor(game.score)
+		local swidth = paintbasic:getWidth(score) / 2
+		love.graphics.print(score, WIDTH / 2 - swidth / 2, 460)
 
-	love.graphics.print(love.timer.getFPS(), 10, 10)
+		local minutes = math.floor(game.time_left / 60)
+		local seconds = math.floor(game.time_left % 60)
+		local time = string.format("%02d:%02d", minutes, seconds)
+		local twidth = paintbasic:getWidth(time) / 2
+		love.graphics.print(time, WIDTH / 2 - twidth, 70)
+	else
+		--love.graphics.setShader(shader)
+		--love.graphics.draw(title, titlex + 2, titley)
+
+		love.graphics.setFont(paintbasic)
+		love.graphics.setColor(0.21, 0.77, 0.95, 1)
+		local title_text = "Frogcicle!"
+		local twidth = paintbasic:getWidth(title_text) * 1.5
+		love.graphics.print(title_text, WIDTH / 2 - twidth, 150, 0, 3, 3)
+
+		love.graphics.setFont(paintbasic)
+		love.graphics.setColor(1, 1, 1, 1)
+		local intro_text = "Press anywhere to start!"
+		local iwidth = paintbasic:getWidth(intro_text) / 2
+		love.graphics.print(intro_text, WIDTH / 2 - iwidth, 360, 0)
+
+		--love.graphics.setShader()
+	end
 
 	push:finish()
 end
@@ -219,26 +234,20 @@ function makeRect(x, y, width, height)
 	fixture:setCategory(collision_masks.wall)
 end
 
-function spawnEnemy()
-	local enemy = newEnemy(love.math.random(280, 680), love.math.random(127, 429))
-	enemy:load()
-end
-
 function saveData()
 	local data = {
-		bigger = bigger,
-		debug = debug
+		bigger = config.bigger,
+		debug = config.debug
 	}
 	local serialize = lume.serialize(data)
 	love.filesystem.write(savefile, serialize)
 end
 
 function loadData()
-	local data = {}
 	if love.filesystem.getInfo(savefile) then
-		data = lume.deserialize(love.filesystem.read(savefile))
-		bigger = data.bigger
-		debug = data.debug
+		local data = lume.deserialize(love.filesystem.read(savefile))
+		config.bigger = data.bigger
+		config.debug = data.debug
 	else
 		saveData()
 		print("No previous data found. Creating file.")
@@ -246,7 +255,7 @@ function loadData()
 end
 
 function setupScreen()
-	if bigger then
+	if config.bigger then
 		push:setupScreen(WIDTH, HEIGHT, WIDTH * 2, HEIGHT * 2, {
 			fullscreen = false,
 			resizable = false,

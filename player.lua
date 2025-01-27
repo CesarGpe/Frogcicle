@@ -24,6 +24,7 @@ function player.load()
     player.shanimations, player.shanim = cirnoAnims(player.shadow)
 
     player.body = love.physics.newBody(world, player.x, player.y, "dynamic")
+    player.body:setLinearDamping(player.friction)
     player.body:setFixedRotation(true)
     player.shape = love.physics.newCircleShape(player.radius)
     player.fixture = love.physics.newFixture(player.body, player.shape)
@@ -66,15 +67,9 @@ function player.draw()
     player.anim:draw(player.sprite, player.x, player.y, 0, player.scale, player.scale)
 end
 
-function player.physics(dt)
-    local velx, vely = player.body:getLinearVelocity()
-    player.body:setLinearVelocity(velx * (1 - math.min(dt * player.friction, 1)),
-        vely * (1 - math.min(dt * player.friction, 1)))
-end
-
-function player.move(dt)
+function player.controls()
     local dx, dy = 0, 0
-    if game_active and not in_trans then
+    if game.active and not game.transitioning then
         if love.keyboard.isDown("d", "right") then dx = dx + 1 end
         if love.keyboard.isDown("a", "left") then dx = dx - 1 end
         if love.keyboard.isDown("s", "down") then dy = dy + 1 end
@@ -91,7 +86,7 @@ function player.move(dt)
 end
 
 local deltaX, deltaY, angle
-function player.face(dt)
+function player.face_cursor(dt)
     deltaX = mouseX - player.body:getX()
     deltaY = mouseY - player.body:getY()
     angle = math.atan2(deltaY, deltaX)
@@ -101,7 +96,7 @@ function player.face(dt)
         angleDeg = angleDeg + 360
     end
 
-    if not in_trans then
+    if not game.transitioning then
         if angleDeg < 22.5 or angleDeg >= 337.5 then
             if player.shooting then
                 player.anim = player.animations.right_attack
@@ -176,11 +171,10 @@ function player.update(dt)
     player.x = player.body:getX() - player.offsetx
     player.y = player.body:getY() - player.offsety
 
-    player.physics(dt)
-    player.move(dt)
-    player.face(dt)
+    player.controls()
+    player.face_cursor(dt)
 
-    if love.mouse.isDown(1) and game_active and player.can_shoot and not player.shooting then
+    if love.mouse.isDown(1) and game.active and player.can_shoot and not player.shooting then
         player.shoot()
     end
 end

@@ -2,16 +2,19 @@ require("libs.tesound")
 sounds = {}
 
 function sounds.leap()
-    TEsound.play("sound/frog-leap.ogg", "static", "leap", 0.35, 1)
+    TEsound.play("sound/frog-leap.ogg", "static", "leap", 0.6, 1)
+end
+function sounds.croak()
+    TEsound.play("sound/frog-croak.ogg", "static", "croak", 0.35, 1)
 end
 function sounds.shoot()
-    TEsound.play("sound/freeze-shot.ogg", "static", "shoot", 0.35, 1)
+    TEsound.play("sound/freeze-shot.ogg", "static", "shoot", 0.25, 1)
 end
 function sounds.hit()
-    TEsound.play("sound/freeze-hit.ogg", "static", "hit", 0.35, 1)
+    TEsound.play("sound/freeze-hit.ogg", "static", "hit", 0.25, 1)
 end
 function sounds.freeze()
-    TEsound.play("sound/chime.ogg", "static", "freeze", 0.8, 1)
+    TEsound.play("sound/chime.ogg", "static", "freeze", 0.6, 1)
 end
 function sounds.defreeze()
     TEsound.play({"sound/ice-crack1.ogg", "sound/ice-crack2.ogg", "sound/ice-crack3.ogg"}, "static", "defreeze", 1, 1)
@@ -19,6 +22,7 @@ end
 function sounds.df_chime()
     TEsound.play({"sound/ice-break1.ogg", "sound/ice-break2.ogg", "sound/ice-break3.ogg"}, "static", "df_chime", 0.5, 1)
 end
+
 function sounds.intro()
     TEsound.play("sound/game-intro.ogg", "static", "intro", 0.35, 1)
 end
