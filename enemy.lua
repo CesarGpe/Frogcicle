@@ -18,6 +18,7 @@ function newEnemy(x, y)
 		ice = love.graphics.newImage("sprites/frozen.png"),
 		sprite = love.graphics.newImage("sprites/suwako-sheet.png"),
 		shadow = love.graphics.newImage("sprites/suwako-shadow.png"),
+		eanim = {},
 		animations = {},
 		anim = {},
 		shanimations = {},
@@ -203,6 +204,12 @@ function newEnemy(x, y)
 				self.shape = nil
 				self.body:destroy()
 			end)
+		end,
+
+		delete = function(self)
+			self.fixture:destroy()
+			self.shape = nil
+			self.body:destroy()
 		end
 	}
 end
@@ -229,7 +236,7 @@ function suwakoAnims(sprite)
 	animations.up_left_jump = anim8.newAnimation(grid("2-2", 8), 0.2)
 	animations.shocked = anim8.newAnimation(grid("1-1", 9), 1)
 	animations.dead = anim8.newAnimation(grid("2-2", 9), 1)
-	anim = animations.down
+	local anim = animations.down
 
 	return animations, anim
 end

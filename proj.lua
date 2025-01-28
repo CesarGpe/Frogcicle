@@ -1,5 +1,3 @@
-projectiles = {}
-
 function newProj(x, y, dx, dy, angle)
 	return {
 		x = x,
@@ -26,7 +24,6 @@ function newProj(x, y, dx, dy, angle)
 			self.fixture:setCategory(collision_masks.projectile)
 			self.fixture:setMask(collision_masks.player, collision_masks.projectile)
 
-			table.insert(projectiles, self)
 			self.fixture:setUserData(self)
 			self.body:applyLinearImpulse(dx, dy)
 		end,
@@ -38,10 +35,6 @@ function newProj(x, y, dx, dy, angle)
 		update = function(self, dt)
 			self.x = self.body:getX() - self.offsetx
 			self.y = self.body:getY() - self.offsety
-
-			--[[local velx, vely = self.body:getLinearVelocity()
-			self.body:setLinearVelocity(velx * (1 - math.min(dt * self.friction, 1)),
-				vely * (1 - math.min(dt * self.friction, 1)))]]
 		end,
 
 		destroy = function(self)

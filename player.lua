@@ -53,7 +53,9 @@ function cirnoAnims(sprite)
     animations.left_attack = anim8.newAnimation(grid("5-5", 7), 0.2)
     animations.up_left = anim8.newAnimation(grid("1-4", 8), 0.2)
     animations.up_left_attack = anim8.newAnimation(grid("5-5", 8), 0.2)
-    anim = animations.down
+    animations.yeah = anim8.newAnimation(grid("1-4", 9), 0.2)
+    animations.dead = anim8.newAnimation(grid("5-5", 9), 1)
+    local anim = animations.down
 
     return animations, anim
 end
@@ -87,8 +89,8 @@ end
 
 local deltaX, deltaY, angle
 function player.face_cursor(dt)
-    deltaX = mouseX - player.body:getX()
-    deltaY = mouseY - player.body:getY()
+    deltaX = game.mouse.x - player.body:getX()
+    deltaY = game.mouse.y - player.body:getY()
     angle = math.atan2(deltaY, deltaX)
 
     local angleDeg = math.deg(angle)
@@ -96,7 +98,9 @@ function player.face_cursor(dt)
         angleDeg = angleDeg + 360
     end
 
-    if not game.transitioning then
+    if game.over then
+        player.anim = player.animations.dead
+    elseif not game.transitioning then
         if angleDeg < 22.5 or angleDeg >= 337.5 then
             if player.shooting then
                 player.anim = player.animations.right_attack
@@ -146,6 +150,8 @@ function player.face_cursor(dt)
                 player.anim = player.animations.up_right
             end
         end
+    else
+        player.anim = player.animations.yeah
     end
     player.anim:update(dt)
 end
@@ -158,9 +164,8 @@ function player.shoot()
 
     local dx = player.proj_speed * math.cos(angle)
     local dy = player.proj_speed * math.sin(angle)
-    local proj = newProj(player.body:getX() + dx, player.body:getY() + dy, dx, dy, angle)
     sounds.shoot()
-    proj:load()
+    game.proj_manager:new_proj(player.body:getX() + dx, player.body:getY() + dy, dx, dy, angle)
 end
 
 function player.update(dt)
