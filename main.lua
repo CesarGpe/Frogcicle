@@ -19,10 +19,10 @@ function love.load()
 	screen.setup()
 	fonts.load()
 
-	--wall.new(0, 0, 665, 1600) -- left wall
-	--wall.new(900, 0, 330, 1600) -- right wall
-	--wall.new(0, 0, 2150, 515) -- up wall
-	--wall.new(0, 683, 2150, 250) -- down wall
+	wall.new(0, 0, 1135, 1600) -- left wall
+	wall.new(1535, 0, 1135, 1600) -- right wall
+	wall.new(0, 0, 2310, 580) -- up wall
+	wall.new(0, 880, 2310, 580) -- down wall
 
 	sounds.menu_music()
 	player.load()
@@ -43,12 +43,12 @@ end
 function love.keypressed(key, scancode, isrepeat)
 	if key == "f11" then
 		save_data.config.bigger = not save_data.config.bigger
-		--game.mobile = not game.mobile
 		screen:setup()
 		save_data:save()
 	end
 	if key == "r" then
-		screen.shake(0.5, 0.5, 1)
+		game.cam.trauma = game.cam.trauma + 0.2
+		--screen.shake(0.5, 0.5, 1)
 	end
 	if key == "-" then
 		save_data.config.debug = not save_data.config.debug
@@ -77,6 +77,7 @@ function love.update(dt)
 		game.music_timer.update(dt)
 	end
 
+	screen.update(dt)
 	world:update(dt)
 	timer.update(dt)
 	flux.update(dt)
@@ -88,12 +89,10 @@ function love.draw()
 
 	game.camera:setPosition(game.cam.x + game.cam.ofsx, game.cam.y + game.cam.ofsy)
 	game.camera:setScale(game.cam.scale + game.cam.zoom)
+	game.camera:setAngle(game.cam.angle)
 	game.camera:draw(draw_game)
 
 	push:finish()
-
-	local x, y = game.camera:getPosition()
-	love.graphics.print(x .. ", " .. y, 40, 40)
 end
 
 function draw_game()

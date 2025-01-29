@@ -90,8 +90,7 @@ end
 
 local mousex, mousey = 0, 0
 function player.face_cursor(dt)
-    local tempx, tempy = push:toGame(love.mouse.getPosition())
-    --local tempx, tempy = love.mouse.getPosition()
+    local tempx, tempy = game.get_mouse()
     if tempx and tempy then
         mousex, mousey = tempx, tempy
     end
@@ -171,7 +170,6 @@ function player.shoot()
 
     local dx = player.proj_speed * math.cos(player.angle)
     local dy = player.proj_speed * math.sin(player.angle)
-    sounds.shoot()
     game.proj_manager:new_proj(player.body:getX() + dx, player.body:getY() + dy, dx, dy, player.angle)
 end
 

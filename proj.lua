@@ -23,6 +23,7 @@ function newProj(x, y, dx, dy, angle)
 
 			self.fixture:setUserData(self)
 			self.body:applyLinearImpulse(dx, dy)
+			sounds.shoot()
 		end,
 
 		draw = function(self)

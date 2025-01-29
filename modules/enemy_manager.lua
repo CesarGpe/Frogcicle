@@ -39,7 +39,7 @@ function manager:update(dt)
 end
 
 function manager:spawn_enemy()
-	local enemy = newEnemy(love.math.random(333, 680), love.math.random(256, 429))
+	local enemy = newEnemy(love.math.random(568, 680), love.math.random(290, 429))
 	enemy:load()
     sounds.croak()
     table.insert(self.enemies, enemy)

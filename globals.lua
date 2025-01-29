@@ -13,7 +13,9 @@ function set_globals(mobile)
 			ofsx = 0,
 			ofsy = 0,
 			scale = 1,
-			zoom = 0
+			zoom = 0,
+			angle = 0,
+			trauma = 0,
 		},
 		transitioning = false,
 		can_click = false,
@@ -27,6 +29,9 @@ function set_globals(mobile)
 		time_left = 50,
 		music_timer = {},
 		mobile = false,
+		get_mouse = function()
+			return love.mouse.getPosition()
+		end
 	}
 
 	save_data = require("modules.save_data")
@@ -49,4 +54,10 @@ function set_globals(mobile)
 		game.mobile = true
 		print("YOU'VE DOWNLOADED ME ON YOUR ANDROID DEVICE.")
 	end
+end
+
+function math.clamp(val, lower, upper)
+    assert(val and lower and upper, "there was an error lol")
+    if lower > upper then lower, upper = upper, lower end
+    return math.max(lower, math.min(upper, val))
 end

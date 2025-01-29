@@ -35,6 +35,8 @@ function newEnemy(x, y)
 		die_anim_timer = {},
 		blinking = false,
 		blink_timer = {},
+		shader = love.graphics.newShader("shader/override_rgb.fs"),
+		tint = { r = 1, g = 1, b = 1, a = 0 },
 
 		load = function(self)
 			self.animations, self.anim = suwakoAnims(self.sprite)
@@ -56,13 +58,18 @@ function newEnemy(x, y)
 		end,
 
 		draw_shadow = function(self)
+			self.shader:send("new", { self.tint.r, self.tint.g, self.tint.b, self.tint.a })
+			love.graphics.setShader(self.shader)
 			if not self.blinking or (self.blink_timer and math.floor(self.blink_timer.getTime() * 10) % 2 == 0) then
 				self.shanim = self.anim
 				self.shanim:draw(self.shadow, self.x, self.y, 0, self.scale, self.scale)
 			end
+			love.graphics.setShader()
 		end,
 
 		draw = function(self)
+			self.shader:send("new", { self.tint.r, self.tint.g, self.tint.b, self.tint.a })
+			love.graphics.setShader(self.shader)
 			if self.frozen then
 				love.graphics.setColor(0.7, 0.7, 1, 1)
 				self.anim:draw(self.sprite, self.x, self.y, 0, self.scale, self.scale)
@@ -73,6 +80,7 @@ function newEnemy(x, y)
 				love.graphics.setColor(1, 1, 1, 1)
 				self.anim:draw(self.sprite, self.x, self.y, 0, self.scale, self.scale)
 			end
+			love.graphics.setShader()
 		end,
 
 		update = function(self, dt)
@@ -180,10 +188,19 @@ function newEnemy(x, y)
 		end,
 
 		freeze = function(self)
-			if not self.frozen then
+			--[[if not self.frozen then
 				sounds.freeze()
-			end
+				self.tint.a = 1
+				flux.to(self.tint, 0.35, { a = 0 })
+				game.cam.trauma = game.cam.trauma + 0.15
+			end]]
+
+			sounds.freeze()
 			self.frozen = true
+			self.tint.a = 1
+			flux.to(self.tint, 0.35, { a = 0 })
+			game.cam.trauma = game.cam.trauma + 0.15
+
 			self.freeze_timer = ticker.new(self.ice_time, function()
 				self.frozen = false
 				sounds.defreeze()
