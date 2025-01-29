@@ -4,10 +4,10 @@ local ui_gameover = {
 
 function ui_gameover:load()
     self.text_alpha = 0
-    timers.oneshot(1, function() game.can_click = true end)
-    game.music_timer = timers.new(2, function()
+    timer.after(1, function() game.can_click = true end)
+    game.music_timer = ticker.new(2, function()
         sounds.death_music()
-        flux.to(ui_gameover, 2.5, { text_alpha = 1 })
+        flux.to(ui_gameover, 2, { text_alpha = 1 })
     end)
     sounds.stop_game_music()
     game.enemy_manager:kill_everyone()

@@ -1,29 +1,23 @@
 local screen = {}
 
 function screen.setup()
-	if game.mobile then
+	if save_data.config.bigger or game.mobile then
 		local screenWidth, screenHeight = love.window.getDesktopDimensions()
-		push:setupScreen(WIDTH, HEIGHT, screenWidth, screenHeight, { fullscreen = true, resizable = false })
-		game.cam.x, game.cam.y = push:toGame(WIDTH / 2, HEIGHT / 2)
-		game.cam.x = -game.cam.x
-		game.cam.y = -game.cam.y
-	elseif save_data.config.bigger then
-		push:setupScreen(WIDTH, HEIGHT, WIDTH * 2, HEIGHT * 2, {
-			fullscreen = false,
-			resizable = false,
-			pixelperfect = true
-		})
-		game.cam.x, game.cam.y = push:toGame(WIDTH, HEIGHT)
-		game.cam.x = -game.cam.x
-		game.cam.y = -game.cam.y
+		push:setupScreen(WIDTH, HEIGHT, screenWidth, screenHeight,
+			{ fullscreen = true, resizable = false, pixelperfect = true })
+		game.cam.scale = 2
 	else
-		push:setupScreen(WIDTH, HEIGHT, WIDTH, HEIGHT, {
-			fullscreen = false,
-			resizable = false,
-			pixelperfect = true
-		})
-		game.cam.x, game.cam.y = push:toGame(WIDTH * 2, HEIGHT * 2)
+		push:setupScreen(WIDTH, HEIGHT, WIDTH * 2, HEIGHT * 2,
+			{ fullscreen = false, resizable = false, pixelperfect = true })
+		game.cam.scale = 1
 	end
+end
+
+function screen.shake(time, intensity, variation)
+	timer.during(time, function()
+		game.cam.ofsx = intensity * love.math.random(-variation, variation)
+		game.cam.ofsy = intensity * love.math.random(-variation, variation)
+	end)
 end
 
 return screen

@@ -5,12 +5,9 @@ function newProj(x, y, dx, dy, angle)
 		dx = dx,
 		dy = dy,
 		angle = angle,
-		offsetx = 0,
-		offsety = 0,
-		radius = 4,
-		scale = 1,
-		friction = 6,
-		sprite = love.graphics.newImage("sprites/ice-shot.png"),
+		radius = 5,
+		scale = 0.75,
+		sprite = love.graphics.newImage("sprites/ice-shot-big.png"),
 		body = {},
 		shape = {},
 		fixture = {},
@@ -33,8 +30,8 @@ function newProj(x, y, dx, dy, angle)
 		end,
 
 		update = function(self, dt)
-			self.x = self.body:getX() - self.offsetx
-			self.y = self.body:getY() - self.offsety
+			self.x = self.body:getX()
+			self.y = self.body:getY()
 		end,
 
 		destroy = function(self)

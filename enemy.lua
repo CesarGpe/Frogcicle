@@ -49,8 +49,8 @@ function newEnemy(x, y)
 			self.fixture:setCategory(collision_masks.enemy)
 
 			self.jump_time = self.jump_time + (love.math.random() * 2 - 1)
-			table.insert(self.timings, timers.new(self.jump_time, function() self:jump() end))
-			table.insert(self.timings, timers.new(self.life_span, function() self:destroy() end))
+			table.insert(self.timings, ticker.new(self.jump_time, function() self:jump() end))
+			table.insert(self.timings, ticker.new(self.life_span, function() self:destroy() end))
 
 			self.fixture:setUserData(self)
 		end,
@@ -104,7 +104,7 @@ function newEnemy(x, y)
 		jump = function(self)
 			-- jump again!!
 			table.insert(self.timings,
-				timers.new(self.jump_time + self.jump_delay + (love.math.random() - self.jump_randomness),
+				ticker.new(self.jump_time + self.jump_delay + (love.math.random() - self.jump_randomness),
 					function() self:jump() end))
 
 			local mx = love.math.random(0, 1) * 2 - 1 * (1 + love.math.random())
@@ -135,7 +135,7 @@ function newEnemy(x, y)
 				self.anim = self.animations.down_left
 			end
 
-			table.insert(self.timings, timers.new(self.jump_delay, function()
+			table.insert(self.timings, ticker.new(self.jump_delay, function()
 				self.body:applyLinearImpulse(self.jump_strength * mx, self.jump_strength * my)
 				sounds.leap()
 
@@ -158,7 +158,7 @@ function newEnemy(x, y)
 				end
 			end))
 
-			table.insert(self.timings, timers.new(self.jump_delay + self.jump_length, function()
+			table.insert(self.timings, ticker.new(self.jump_delay + self.jump_length, function()
 				if self.anim == self.animations.up_jump then
 					self.anim = self.animations.up
 				elseif self.anim == self.animations.down_jump then
@@ -184,7 +184,7 @@ function newEnemy(x, y)
 				sounds.freeze()
 			end
 			self.frozen = true
-			self.freeze_timer = timers.new(self.ice_time, function()
+			self.freeze_timer = ticker.new(self.ice_time, function()
 				self.frozen = false
 				sounds.defreeze()
 				sounds.df_chime()
@@ -194,12 +194,12 @@ function newEnemy(x, y)
 		destroy = function(self)
 			self.dying = true
 			self.anim = self.animations.shocked
-			self.die_anim_timer = timers.new(0.6, function()
+			self.die_anim_timer = ticker.new(0.6, function()
 				self.anim = self.animations.dead
 				self.blinking = true
-				self.blink_timer = timers.new(1.4)
+				self.blink_timer = ticker.new(1.4)
 			end)
-			self.die_timer = timers.new(2, function()
+			self.die_timer = ticker.new(2, function()
 				self.fixture:destroy()
 				self.shape = nil
 				self.body:destroy()

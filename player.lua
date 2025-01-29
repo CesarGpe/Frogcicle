@@ -6,6 +6,7 @@ player = {}
 function player.load()
     player.x = WIDTH / 2
     player.y = HEIGHT / 2
+    player.angle = 0
     player.offsetx = 12
     player.offsety = 20
     player.radius = 8
@@ -16,7 +17,7 @@ function player.load()
     player.can_shoot = true
     player.anim_time = 0.1
     player.shoot_time = 0.5
-    player.proj_speed = 10
+    player.proj_speed = 15
     player.timings = {}
     player.sprite = love.graphics.newImage("sprites/cirno-sheet.png")
     player.shadow = love.graphics.newImage("sprites/cirno-shadow.png")
@@ -87,13 +88,19 @@ function player.controls()
     player.body:applyForce(player.speed * dx, player.speed * dy)
 end
 
-local deltaX, deltaY, angle
+local mousex, mousey = 0, 0
 function player.face_cursor(dt)
-    deltaX = game.mouse.x - player.body:getX()
-    deltaY = game.mouse.y - player.body:getY()
-    angle = math.atan2(deltaY, deltaX)
+    local tempx, tempy = push:toGame(love.mouse.getPosition())
+    --local tempx, tempy = love.mouse.getPosition()
+    if tempx and tempy then
+        mousex, mousey = tempx, tempy
+    end
 
-    local angleDeg = math.deg(angle)
+    local deltaX = mousex - player.body:getX()
+    local deltaY = mousey - player.body:getY()
+    player.angle = math.atan2(deltaY, deltaX)
+
+    local angleDeg = math.deg(player.angle)
     if angleDeg < 0 then
         angleDeg = angleDeg + 360
     end
@@ -159,13 +166,13 @@ end
 function player.shoot()
     player.shooting = true
     player.can_shoot = false
-    table.insert(player.timings, timers.new(player.anim_time, function() player.shooting = false end))
-    table.insert(player.timings, timers.new(player.shoot_time, function() player.can_shoot = true end))
+    table.insert(player.timings, ticker.new(player.anim_time, function() player.shooting = false end))
+    table.insert(player.timings, ticker.new(player.shoot_time, function() player.can_shoot = true end))
 
-    local dx = player.proj_speed * math.cos(angle)
-    local dy = player.proj_speed * math.sin(angle)
+    local dx = player.proj_speed * math.cos(player.angle)
+    local dy = player.proj_speed * math.sin(player.angle)
     sounds.shoot()
-    game.proj_manager:new_proj(player.body:getX() + dx, player.body:getY() + dy, dx, dy, angle)
+    game.proj_manager:new_proj(player.body:getX() + dx, player.body:getY() + dy, dx, dy, player.angle)
 end
 
 function player.update(dt)

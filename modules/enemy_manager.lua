@@ -39,19 +39,13 @@ function manager:update(dt)
 end
 
 function manager:spawn_enemy()
-	local enemy = newEnemy(love.math.random(280, 680), love.math.random(127, 429))
+	local enemy = newEnemy(love.math.random(333, 680), love.math.random(256, 429))
 	enemy:load()
     sounds.croak()
     table.insert(self.enemies, enemy)
-    self.timer = timers.new(self.spawnrate, function()
+    self.timer = ticker.new(self.spawnrate, function()
         self:spawn_enemy()
     end)
-end
-
-function manager:debug_spawn()
-	local enemy = newEnemy(love.math.random(280, 680), love.math.random(127, 429))
-	enemy:load()
-    table.insert(self.enemies, enemy)
 end
 
 function manager:kill_everyone()
