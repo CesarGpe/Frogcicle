@@ -13,7 +13,7 @@ function ui_menu:load()
     timer.after(0.5, function() game.can_click = true end)
     timer.after(0.15, function()
         flux.to(ui_menu, 0.6, { titley = self.titley + 360, introy = self.introy - 340 }):ease("elasticout")
-        --flux.to(game.cam, 0.8, { zoom = 1 }):ease("elasticout")
+        flux.to(game.cam, 0.8, { zoom = 1 }):ease("elasticout")
     end)
 end
 

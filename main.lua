@@ -73,13 +73,17 @@ function love.update(dt)
 		end
 	end
 
+	if game.music_timer.update then
+		game.music_timer.update(dt)
+	end
+
 	player.update(dt)
 	proj_manager:update()
 	enemy_manager:update(dt + game.difficulty * 0.001)
 
-	if game.music_timer.update then
-		game.music_timer.update(dt)
-	end
+	game.camera:setPosition(game.cam.x + game.cam.ofsx, game.cam.y + game.cam.ofsy)
+	game.camera:setScale(game.cam.scale + game.cam.zoom)
+	game.camera:setAngle(game.cam.angle)
 
 	ui_menu:update(dt)
 	screen.update(dt)
@@ -91,11 +95,9 @@ end
 
 function love.draw()
 	push:start()
-	game.camera:setPosition(game.cam.x + game.cam.ofsx, game.cam.y + game.cam.ofsy)
-	game.camera:setScale(game.cam.scale + game.cam.zoom)
-	game.camera:setAngle(game.cam.angle)
 	game.camera:draw(draw_game)
 	push:finish()
+	--love.graphics.print(love.timer.getFPS(), 10, 10)
 end
 
 function draw_game()
