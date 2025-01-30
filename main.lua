@@ -41,18 +41,12 @@ function love.mousepressed(x, y, button, istouch, presses)
 end
 
 function love.keypressed(key, scancode, isrepeat)
-	if key == "f11" then
-		save_data.config.bigger = not save_data.config.bigger
-		screen:setup()
-		save_data:save()
-	end
-	if key == "r" then
-		game.cam.trauma = game.cam.trauma + 0.2
-		--screen.shake(0.5, 0.5, 1)
-	end
 	if key == "-" then
 		save_data.config.debug = not save_data.config.debug
 		save_data:save()
+	end
+	if key == "r" and save_data.config.debug then
+		game.cam.trauma = game.cam.trauma + 0.2
 	end
 end
 
@@ -70,8 +64,8 @@ function love.update(dt)
 	end
 
 	player.update(dt)
-	game.proj_manager:update()
-	game.enemy_manager:update(dt + game.difficulty * 0.001)
+	proj_manager:update()
+	enemy_manager:update(dt + game.difficulty * 0.001)
 
 	if game.music_timer.update then
 		game.music_timer.update(dt)
@@ -97,7 +91,7 @@ end
 
 function draw_game()
 	stage:draw()
-	drawer.draw(game.enemy_manager.enemies, game.proj_manager.projectiles)
+	drawer.draw(enemy_manager.enemies, proj_manager.projectiles)
 
 	if save_data.config.debug then debug.draw() end
 	if game.menu then ui_menu:draw() end

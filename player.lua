@@ -32,33 +32,14 @@ function player.load()
     player.fixture:setRestitution(0.15)
     player.fixture:setCategory(collision_masks.player)
     player.fixture:setMask(collision_masks.projectile)
-end
 
-function cirnoAnims(sprite)
-    local grid = anim8.newGrid(24, 32, sprite:getWidth(), sprite:getHeight())
-    local animations = {}
-
-    animations.up = anim8.newAnimation(grid("1-4", 1), 0.2)
-    animations.up_attack = anim8.newAnimation(grid("5-5", 1), 0.2)
-    animations.up_right = anim8.newAnimation(grid("1-4", 2), 0.2)
-    animations.up_right_attack = anim8.newAnimation(grid("5-5", 2), 0.2)
-    animations.right = anim8.newAnimation(grid("1-4", 3), 0.2)
-    animations.right_attack = anim8.newAnimation(grid("5-5", 3), 0.2)
-    animations.down_right = anim8.newAnimation(grid("1-4", 4), 0.2)
-    animations.down_right_attack = anim8.newAnimation(grid("5-5", 4), 0.2)
-    animations.down = anim8.newAnimation(grid("1-4", 5), 0.2)
-    animations.down_attack = anim8.newAnimation(grid("5-5", 5), 0.2)
-    animations.down_left = anim8.newAnimation(grid("1-4", 6), 0.2)
-    animations.down_left_attack = anim8.newAnimation(grid("5-5", 6), 0.2)
-    animations.left = anim8.newAnimation(grid("1-4", 7), 0.2)
-    animations.left_attack = anim8.newAnimation(grid("5-5", 7), 0.2)
-    animations.up_left = anim8.newAnimation(grid("1-4", 8), 0.2)
-    animations.up_left_attack = anim8.newAnimation(grid("5-5", 8), 0.2)
-    animations.yeah = anim8.newAnimation(grid("1-4", 9), 0.2)
-    animations.dead = anim8.newAnimation(grid("5-5", 9), 1)
-    local anim = animations.down
-
-    return animations, anim
+    player.particles = love.graphics.newParticleSystem(love.graphics.newImage("sprites/ice-particle.png"), 1000)
+    player.particles:setParticleLifetime(0.3, 0.6)
+    player.particles:setSizeVariation(1)
+    player.particles:setSpread(0.5)
+    player.particles:setSpeed(50)
+    player.particles:setSpin(10, 40)
+    player.particles:setColors(1, 1, 1, 1, 1, 1, 1, 0)
 end
 
 function player.draw_shadow()
@@ -67,6 +48,7 @@ function player.draw_shadow()
 end
 
 function player.draw()
+    love.graphics.draw(player.particles)
     player.anim:draw(player.sprite, player.x, player.y, 0, player.scale, player.scale)
 end
 
@@ -88,11 +70,10 @@ function player.controls()
     player.body:applyForce(player.speed * dx, player.speed * dy)
 end
 
-local mousex, mousey = 0, 0
 function player.face_cursor(dt)
-    local tempx, tempy = game.get_mouse()
-    if tempx and tempy then
-        mousex, mousey = tempx, tempy
+    local mousex, mousey = game.camera:toWorld(love.mouse.getPosition())
+    if not mousex or not mousey then
+        mousex, mousey = 0, 0
     end
 
     local deltaX = mousex - player.body:getX()
@@ -170,7 +151,13 @@ function player.shoot()
 
     local dx = player.proj_speed * math.cos(player.angle)
     local dy = player.proj_speed * math.sin(player.angle)
-    game.proj_manager:new_proj(player.body:getX() + dx, player.body:getY() + dy, dx, dy, player.angle)
+    proj_manager:new_proj(player.body:getX() + dx, player.body:getY() + dy, dx, dy, player.angle)
+
+    local m = 5
+    player.particles:setLinearAcceleration(dx*m, dy*m, dx*m, dy*m)
+    player.particles:setEmissionArea("uniform", 5, 5, player.angle, false)
+    player.particles:setDirection(player.angle)
+    player.particles:emit(15)
 end
 
 function player.update(dt)
@@ -184,7 +171,37 @@ function player.update(dt)
     player.controls()
     player.face_cursor(dt)
 
+    player.particles:update(dt)
+    player.particles:setPosition(player.body:getX(), player.body:getY())
+
     if love.mouse.isDown(1) and game.active and player.can_shoot and not player.shooting then
         player.shoot()
     end
+end
+
+function cirnoAnims(sprite)
+    local grid = anim8.newGrid(24, 32, sprite:getWidth(), sprite:getHeight())
+    local animations = {}
+
+    animations.up = anim8.newAnimation(grid("1-4", 1), 0.2)
+    animations.up_attack = anim8.newAnimation(grid("5-5", 1), 0.2)
+    animations.up_right = anim8.newAnimation(grid("1-4", 2), 0.2)
+    animations.up_right_attack = anim8.newAnimation(grid("5-5", 2), 0.2)
+    animations.right = anim8.newAnimation(grid("1-4", 3), 0.2)
+    animations.right_attack = anim8.newAnimation(grid("5-5", 3), 0.2)
+    animations.down_right = anim8.newAnimation(grid("1-4", 4), 0.2)
+    animations.down_right_attack = anim8.newAnimation(grid("5-5", 4), 0.2)
+    animations.down = anim8.newAnimation(grid("1-4", 5), 0.2)
+    animations.down_attack = anim8.newAnimation(grid("5-5", 5), 0.2)
+    animations.down_left = anim8.newAnimation(grid("1-4", 6), 0.2)
+    animations.down_left_attack = anim8.newAnimation(grid("5-5", 6), 0.2)
+    animations.left = anim8.newAnimation(grid("1-4", 7), 0.2)
+    animations.left_attack = anim8.newAnimation(grid("5-5", 7), 0.2)
+    animations.up_left = anim8.newAnimation(grid("1-4", 8), 0.2)
+    animations.up_left_attack = anim8.newAnimation(grid("5-5", 8), 0.2)
+    animations.yeah = anim8.newAnimation(grid("1-4", 9), 0.2)
+    animations.dead = anim8.newAnimation(grid("5-5", 9), 1)
+    local anim = animations.down
+
+    return animations, anim
 end

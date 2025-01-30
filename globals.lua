@@ -1,11 +1,10 @@
 function set_globals(mobile)
+	love = require("love")
 	love.audio.stop()
 	love.graphics.setDefaultFilter("nearest", "nearest", 1)
 
 	----==== GAME VARIABLES ===----
 	game = {
-		enemy_manager = require("modules.enemy_manager"),
-		proj_manager = require("modules.proj_manager"),
 		camera = require("libs.gamera").new(0, 0, WIDTH, HEIGHT),
 		cam = {
 			x = WIDTH / 2,
@@ -25,15 +24,13 @@ function set_globals(mobile)
 		difficulty = 0,
 		score = 0,
 		frozen_enemies = 0,
-		--time_left = 2,
 		time_left = 50,
-		music_timer = {},
-		mobile = false,
-		get_mouse = function()
-			return love.mouse.getPosition()
-		end
+		music_timer = {}
 	}
 
+	----==== MODULES & LIBRARIES ===----
+	enemy_manager = require("modules.enemy_manager")
+	proj_manager = require("modules.proj_manager")
 	save_data = require("modules.save_data")
 	fonts = require("modules.fonts")
 	timer = require("libs.timer")
@@ -48,12 +45,6 @@ function set_globals(mobile)
 		wall = 4,
 		projectile = 8,
 	}
-
-	-- android rubbish
-	if mobile then
-		game.mobile = true
-		print("YOU'VE DOWNLOADED ME ON YOUR ANDROID DEVICE.")
-	end
 end
 
 function math.clamp(val, lower, upper)

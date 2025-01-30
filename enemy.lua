@@ -18,7 +18,6 @@ function newEnemy(x, y)
 		ice = love.graphics.newImage("sprites/frozen.png"),
 		sprite = love.graphics.newImage("sprites/suwako-sheet.png"),
 		shadow = love.graphics.newImage("sprites/suwako-shadow.png"),
-		eanim = {},
 		animations = {},
 		anim = {},
 		shanimations = {},
@@ -35,8 +34,9 @@ function newEnemy(x, y)
 		die_anim_timer = {},
 		blinking = false,
 		blink_timer = {},
-		shader = love.graphics.newShader("shader/override_rgb.fs"),
+		shader = love.graphics.newShader("shader/tint.fs"),
 		tint = { r = 1, g = 1, b = 1, a = 0 },
+		particles = love.graphics.newParticleSystem(love.graphics.newImage("sprites/ice-particle.png"), 1000),
 
 		load = function(self)
 			self.animations, self.anim = suwakoAnims(self.sprite)
@@ -49,16 +49,22 @@ function newEnemy(x, y)
 			self.fixture = love.physics.newFixture(self.body, self.shape)
 			self.fixture:setRestitution(0.15)
 			self.fixture:setCategory(collision_masks.enemy)
+			self.fixture:setUserData(self)
 
 			self.jump_time = self.jump_time + (love.math.random() * 2 - 1)
 			table.insert(self.timings, ticker.new(self.jump_time, function() self:jump() end))
 			table.insert(self.timings, ticker.new(self.life_span, function() self:destroy() end))
 
-			self.fixture:setUserData(self)
+			self.particles:setLinearAcceleration(-20, -20, 20, 20)
+			self.particles:setParticleLifetime(0.5, 1)
+			self.particles:setSizeVariation(1)
+			self.particles:setSpread(10)
+			self.particles:setSpeed(40)
+			self.particles:setSpin(10, 40)
+			self.particles:setColors(1, 1, 1, 1, 1, 1, 1, 0)
 		end,
 
 		draw_shadow = function(self)
-			self.shader:send("new", { self.tint.r, self.tint.g, self.tint.b, self.tint.a })
 			love.graphics.setShader(self.shader)
 			if not self.blinking or (self.blink_timer and math.floor(self.blink_timer.getTime() * 10) % 2 == 0) then
 				self.shanim = self.anim
@@ -68,8 +74,8 @@ function newEnemy(x, y)
 		end,
 
 		draw = function(self)
-			self.shader:send("new", { self.tint.r, self.tint.g, self.tint.b, self.tint.a })
 			love.graphics.setShader(self.shader)
+			love.graphics.draw(self.particles)
 			if self.frozen then
 				love.graphics.setColor(0.7, 0.7, 1, 1)
 				self.anim:draw(self.sprite, self.x, self.y, 0, self.scale, self.scale)
@@ -84,6 +90,8 @@ function newEnemy(x, y)
 		end,
 
 		update = function(self, dt)
+			self.shader:send("new", { self.tint.r, self.tint.g, self.tint.b, self.tint.a })
+
 			if self.frozen then
 				if not self.freeze_timer.isExpired() then self.freeze_timer.update(dt) end
 			elseif self.dying then
@@ -105,6 +113,9 @@ function newEnemy(x, y)
 
 			self.x = self.body:getX() - self.offsetx
 			self.y = self.body:getY() - self.offsety
+
+			self.particles:update(dt)
+    		self.particles:setPosition(self.body:getX(), self.body:getY())
 
 			self.anim:update(dt)
 		end,
@@ -194,12 +205,12 @@ function newEnemy(x, y)
 				flux.to(self.tint, 0.35, { a = 0 })
 				game.cam.trauma = game.cam.trauma + 0.15
 			end]]
-
+			self.particles:emit(15)
 			sounds.freeze()
 			self.frozen = true
 			self.tint.a = 1
 			flux.to(self.tint, 0.35, { a = 0 })
-			game.cam.trauma = game.cam.trauma + 0.15
+			game.cam.trauma = game.cam.trauma + 0.16
 
 			self.freeze_timer = ticker.new(self.ice_time, function()
 				self.frozen = false

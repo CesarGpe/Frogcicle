@@ -5,7 +5,6 @@ local save_data = {
 	highscore = 0,
 	config = {
 		debug = false,
-		bigger = false,
 	},
 }
 

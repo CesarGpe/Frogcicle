@@ -8,10 +8,10 @@ function sounds.croak()
     TEsound.play("sound/frog-croak.ogg", "static", "croak", 0.35, 1)
 end
 function sounds.shoot()
-    TEsound.play("sound/freeze-shot.ogg", "static", "shoot", 0.25, 1)
+    TEsound.play("sound/ice-shot.ogg", "static", "shoot", 0.25, 1)
 end
 function sounds.hit()
-    TEsound.play("sound/freeze-hit.ogg", "static", "hit", 0.25, 1)
+    TEsound.play("sound/ice-hit.ogg", "static", "hit", 0.25, 1)
 end
 function sounds.freeze()
     TEsound.play("sound/chime.ogg", "static", "freeze", 0.6, 1)
@@ -48,8 +48,8 @@ end
 
 local death_music = love.audio.newSource("sound/game-over.ogg", "stream")
 function sounds.death_music()
-    --death_music:setLooping(true)
-    death_music:setVolume(0.06)
+    death_music:setLooping(true)
+    death_music:setVolume(0.08)
     death_music:play()
 end
 function sounds.stop_death_music()

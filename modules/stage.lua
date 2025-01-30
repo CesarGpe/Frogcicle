@@ -1,3 +1,4 @@
+local tint = love.graphics.newShader("shader/tint.fs")
 local sprite = love.graphics.newImage("sprites/house.png")
 local stage = {
     x = WIDTH / 2 - sprite:getWidth() / 2,
@@ -6,8 +7,11 @@ local stage = {
 
 function stage:draw()
     if game.over then
-        push:setBorderColor(1, 1, 1)
-        love.graphics.setColor(0, 0, 0, 1)
+        tint:send("new", { 1, 1, 1, 1 })
+        love.graphics.setShader(tint)
+        push:setBorderColor(0, 0, 0)
+        --push:setBorderColor(1, 1, 1)
+        --love.graphics.setColor(0, 0, 0, 1)
     else
         push:setBorderColor(0.173, 0.18, 0.227)
         love.graphics.setColor(1, 1, 1, 1)

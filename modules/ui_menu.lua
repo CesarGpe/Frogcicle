@@ -34,7 +34,7 @@ function ui_menu:start()
     timer.after(0.99, function() flux.to(game.cam, 0.3, { zoom = 0 }):ease(ease) end)
 
     timer.after(1.38, function()
-        game.enemy_manager:init()
+        enemy_manager:init()
         sounds.game_music()
         game.score = 0
         game.active = true
