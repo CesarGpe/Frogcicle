@@ -1,17 +1,19 @@
-function set_globals(mobile)
-	love = require("love")
+local gamera = require("libs.gamera").new(0, 0, WIDTH, HEIGHT)
+love = require("love")
+
+function set_globals()
 	love.audio.stop()
 	love.graphics.setDefaultFilter("nearest", "nearest", 1)
 
 	----==== GAME VARIABLES ===----
 	game = {
-		camera = require("libs.gamera").new(0, 0, WIDTH, HEIGHT),
+		camera = gamera,
 		cam = {
 			x = WIDTH / 2,
 			y = HEIGHT / 2,
 			ofsx = 0,
 			ofsy = 0,
-			scale = 1,
+			scale = 2,
 			zoom = 0,
 			angle = 0,
 			trauma = 0,
@@ -31,7 +33,7 @@ function set_globals(mobile)
 	----==== MODULES & LIBRARIES ===----
 	enemy_manager = require("modules.enemy_manager")
 	proj_manager = require("modules.proj_manager")
-	save_data = require("modules.save_data")
+	savefile = require("modules.savefile")
 	fonts = require("modules.fonts")
 	timer = require("libs.timer")
 	flux = require("libs.flux")

@@ -21,10 +21,15 @@ end
 function ui_gameover:draw()
     love.graphics.setFont(fonts.paintbasic)
     love.graphics.setColor(1, 1, 1, self.text_alpha)
-    --love.graphics.setColor(0, 0, 0, self.text_alpha)
-    local respawn = "Press anywhere to respawn."
-    local rwidth = fonts.paintbasic:getWidth(respawn)
-    love.graphics.print(respawn, player.x + 12 - rwidth / 2, player.y - 40)
+
+    local rstext = "Press anywhere to respawn."
+    local rswidth = fonts.paintbasic:getWidth(rstext)
+    love.graphics.print(rstext, player.x + player.offsetx - rswidth / 2, player.y - 30)
+
+    local sctext = "Score: " .. math.floor(game.score)
+    local scwidth = fonts.paintbasic:getWidth(sctext)
+    love.graphics.print(sctext, player.x + player.offsetx - scwidth / 2, player.y + 50)
+
     love.graphics.setColor(1, 1, 1, 1)
 end
 

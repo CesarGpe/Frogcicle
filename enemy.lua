@@ -205,7 +205,7 @@ function newEnemy(x, y)
 				flux.to(self.tint, 0.35, { a = 0 })
 				game.cam.trauma = game.cam.trauma + 0.15
 			end]]
-			self.particles:emit(15)
+			self.particles:emit(30)
 			sounds.freeze()
 			self.frozen = true
 			self.tint.a = 1

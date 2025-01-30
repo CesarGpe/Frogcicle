@@ -2,21 +2,26 @@ local color_wave = love.graphics.newShader("shader/color_wave.fs")
 local ui_menu = {}
 
 function ui_menu:load()
-    self.intro_visible = true
     self.show = true
+    self.intro_visible = true
     self.titley = (HEIGHT / 2) - 460
     self.introy = (HEIGHT / 2) + 400
+    self.blink_timer = ticker.new(0.5, function()
+        self:intro_blink()
+    end)
 
     timer.after(0.5, function() game.can_click = true end)
     timer.after(0.15, function()
-        flux.to(ui_menu, 0.6, { titley = self.titley + 360, introy = self.introy - 340 }):ease("elasticout"):oncomplete(intro_blink)
-        flux.to(game.cam, 0.8, { zoom = 1 }):ease("elasticout")
+        flux.to(ui_menu, 0.6, { titley = self.titley + 360, introy = self.introy - 340 }):ease("elasticout")
+        --flux.to(game.cam, 0.8, { zoom = 1 }):ease("elasticout")
     end)
 end
 
-function intro_blink()
+function ui_menu:intro_blink()
     ui_menu.intro_visible = not ui_menu.intro_visible
-    timer.after(0.5, intro_blink)
+    self.blink_timer = ticker.new(0.5, function()
+        self:intro_blink()
+    end)
 end
 
 function ui_menu:start()
@@ -42,6 +47,12 @@ function ui_menu:start()
     end)
 end
 
+function ui_menu:update(dt)
+    if not self.blink_timer.isExpired() then
+        self.blink_timer.update(dt)
+    end
+end
+
 function ui_menu:draw()
     color_wave:send("time", love.timer.getTime())
     love.graphics.setShader(color_wave)
@@ -59,6 +70,13 @@ function ui_menu:draw()
         local iwidth = fonts.paintbasic:getWidth(intro_text)
         love.graphics.print(intro_text, WIDTH / 2 - iwidth / 2, ui_menu.introy)
     end
+
+    love.graphics.setFont(fonts.paintbasic)
+    love.graphics.setColor(1, 1, 1, 0.5)
+    local hstext = "Highscore: " .. savefile.data.highscore
+    local iwidth = fonts.paintbasic:getWidth(hstext)
+    love.graphics.print(hstext, WIDTH / 2 - iwidth / 2, ui_menu.introy + 35)
+    love.graphics.setColor(1, 1, 1, 1)
 end
 
 return ui_menu

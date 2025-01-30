@@ -1,14 +1,19 @@
+--local shader = love.graphics.newShader("shader/red_top.fs")
 local screen = {}
 
 function screen.setup()
-	local screenWidth, screenHeight = love.window.getDesktopDimensions()
-	push:setupScreen(WIDTH, HEIGHT, screenWidth, screenHeight,
-		{ fullscreen = true, resizable = false, pixelperfect = true })
-	game.cam.scale = 2
+	if savefile.data.fullscreen then
+		local screenWidth, screenHeight = love.window.getDesktopDimensions()
+		push:setupScreen(WIDTH, HEIGHT, screenWidth, screenHeight,
+			{ fullscreen = true, resizable = false, pixelperfect = savefile.data.pixelperfect })
+	else
+		push:setupScreen(WIDTH, HEIGHT, WIDTH, HEIGHT,
+			{ fullscreen = false, resizable = false, pixelperfect = savefile.data.pixelperfect })
+	end
 
-	--[[push:setupScreen(WIDTH, HEIGHT, WIDTH, HEIGHT,
-		{ fullscreen = false, resizable = false, pixelperfect = true })
-	game.cam.scale = 2]]
+	--shader:send("border_color", { 0, 1, 1, 1 })
+	--shader:send("screen_size", { screen.width, screen.height })
+	--push:setShader(shader)
 end
 
 function screen.update(dt)

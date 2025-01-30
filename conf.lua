@@ -1,5 +1,5 @@
-WIDTH = 1536
-HEIGHT = 864
+WIDTH = 1280
+HEIGHT = 720
 
 local IS_DEBUG = os.getenv("LOCAL_LUA_DEBUGGER_VSCODE") == "1" and arg[2] == "debug"
 if IS_DEBUG then

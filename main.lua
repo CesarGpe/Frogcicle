@@ -15,18 +15,20 @@ local ui_menu = require("modules.ui_menu")
 
 function love.load()
 	set_globals()
-	save_data:load()
+	savefile:load()
 	screen.setup()
 	fonts.load()
 
-	wall.new(0, 0, 1135, 1600) -- left wall
-	wall.new(1535, 0, 1135, 1600) -- right wall
-	wall.new(0, 0, 2310, 580) -- up wall
-	wall.new(0, 880, 2310, 580) -- down wall
+	wall.new(0, 0, 880, 1100) -- left wall
+	wall.new(1280, 0, 880, 1100) -- right wall
+	wall.new(0, 0, 1950, 435) -- up wall
+	wall.new(0, 735, 1950, 435) -- down wall
 
 	sounds.menu_music()
 	player.load()
 	ui_menu:load()
+
+	stage.dark = 0
 end
 
 function love.mousepressed(x, y, button, istouch, presses)
@@ -41,12 +43,14 @@ function love.mousepressed(x, y, button, istouch, presses)
 end
 
 function love.keypressed(key, scancode, isrepeat)
-	if key == "-" then
-		save_data.config.debug = not save_data.config.debug
-		save_data:save()
+	if key == "f11" then
+		savefile.data.fullscreen = not savefile.data.fullscreen
+		screen:setup()
+		savefile:save()
 	end
-	if key == "r" and save_data.config.debug then
-		game.cam.trauma = game.cam.trauma + 0.2
+	if key == "-" then
+		savefile.data.debug = not savefile.data.debug
+		savefile:save()
 	end
 end
 
@@ -60,6 +64,12 @@ function love.update(dt)
 			game.time_left = game.time_left - time_change
 		else
 			ui_gameover:load()
+			flux.to(stage, 1, { dark = 1 })
+			local score = math.floor(game.score)
+			if score > savefile.data.highscore then
+				savefile.data.highscore = score
+				savefile:save()
+			end
 		end
 	end
 
@@ -71,6 +81,7 @@ function love.update(dt)
 		game.music_timer.update(dt)
 	end
 
+	ui_menu:update(dt)
 	screen.update(dt)
 	world:update(dt)
 	timer.update(dt)
@@ -80,12 +91,10 @@ end
 
 function love.draw()
 	push:start()
-
 	game.camera:setPosition(game.cam.x + game.cam.ofsx, game.cam.y + game.cam.ofsy)
 	game.camera:setScale(game.cam.scale + game.cam.zoom)
 	game.camera:setAngle(game.cam.angle)
 	game.camera:draw(draw_game)
-
 	push:finish()
 end
 
@@ -93,7 +102,7 @@ function draw_game()
 	stage:draw()
 	drawer.draw(enemy_manager.enemies, proj_manager.projectiles)
 
-	if save_data.config.debug then debug.draw() end
+	if savefile.data.debug then debug.draw() end
 	if game.menu then ui_menu:draw() end
 	if game.over then ui_gameover:draw() else ui_score:draw() end
 end
