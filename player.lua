@@ -70,10 +70,11 @@ function player.controls()
     player.body:applyForce(player.speed * dx, player.speed * dy)
 end
 
+local mousex, mousey = 0, 0
 function player.face_cursor(dt)
-    local mousex, mousey = game.camera:toWorld(push:toGame(love.mouse.getPosition()))
-    if not mousex or not mousey then
-        mousex, mousey = 0, 0
+    local tempx, tempy = game.mouse_position()
+    if tempx and tempy then
+        mousex, mousey = tempx, tempy
     end
 
     local deltaX = mousex - player.body:getX()

@@ -6,9 +6,17 @@ function screen.setup()
 		local screenWidth, screenHeight = love.window.getDesktopDimensions()
 		push:setupScreen(WIDTH, HEIGHT, screenWidth, screenHeight,
 			{ fullscreen = true, resizable = false, pixelperfect = savefile.data.pixelperfect })
+		push:resize(screenWidth, screenHeight)
+		game.mouse_position = function()
+			return push:toGame(love.mouse.getPosition())
+		end
 	else
 		push:setupScreen(WIDTH, HEIGHT, WIDTH, HEIGHT,
 			{ fullscreen = false, resizable = false, pixelperfect = savefile.data.pixelperfect })
+		push:resize(WIDTH, HEIGHT)
+		game.mouse_position = function()
+			return game.camera:toWorld(push:toGame(love.mouse.getPosition()))
+		end
 	end
 
 	--shader:send("border_color", { 0, 1, 1, 1 })

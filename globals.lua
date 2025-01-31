@@ -27,7 +27,10 @@ function set_globals()
 		score = 0,
 		frozen_enemies = 0,
 		time_left = 50,
-		music_timer = {}
+		music_timer = {},
+		mouse_position = function()
+			return game.camera:toWorld(love.mouse.getPosition())
+		end
 	}
 
 	----==== MODULES & LIBRARIES ===----

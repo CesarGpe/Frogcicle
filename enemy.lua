@@ -1,4 +1,8 @@
 local anim8 = require("libs.anim8")
+local ice = love.graphics.newImage("sprites/frozen.png")
+local sprite = love.graphics.newImage("sprites/suwako-sheet.png")
+local shadow = love.graphics.newImage("sprites/suwako-shadow.png")
+local ice_particle = love.graphics.newImage("sprites/ice-particle.png")
 
 function newEnemy(x, y)
 	return {
@@ -10,14 +14,11 @@ function newEnemy(x, y)
 		scale = 1,
 		friction = 6,
 		life_span = 8,
-		jump_time = 1.5, -- time between each jump without delay
-		jump_delay = 1,  -- the delay between the turn and the jump
-		jump_length = 0.38, -- time in the air when it jumps
-		jump_randomness = 0.5, -- variance of time between jumps
+		jump_time = 1.5,
+		jump_delay = 1,
+		jump_length = 0.38,
+		jump_randomness = 0.5,
 		jump_strength = 60,
-		ice = love.graphics.newImage("sprites/frozen.png"),
-		sprite = love.graphics.newImage("sprites/suwako-sheet.png"),
-		shadow = love.graphics.newImage("sprites/suwako-shadow.png"),
 		animations = {},
 		anim = {},
 		shanimations = {},
@@ -34,13 +35,13 @@ function newEnemy(x, y)
 		die_anim_timer = {},
 		blinking = false,
 		blink_timer = {},
-		shader = love.graphics.newShader("shader/tint.fs"),
 		tint = { r = 1, g = 1, b = 1, a = 0 },
-		particles = love.graphics.newParticleSystem(love.graphics.newImage("sprites/ice-particle.png"), 1000),
+		shader = love.graphics.newShader("shader/tint.fs"),
+		particles = love.graphics.newParticleSystem(ice_particle, 1000),
 
 		load = function(self)
-			self.animations, self.anim = suwakoAnims(self.sprite)
-			self.shanimations, self.shanim = suwakoAnims(self.shadow)
+			self.animations, self.anim = suwakoAnims(sprite)
+			self.shanimations, self.shanim = suwakoAnims(shadow)
 
 			self.body = love.physics.newBody(world, self.x, self.y, "dynamic")
 			self.body:setLinearDamping(self.friction)
@@ -68,7 +69,7 @@ function newEnemy(x, y)
 			love.graphics.setShader(self.shader)
 			if not self.blinking or (self.blink_timer and math.floor(self.blink_timer.getTime() * 10) % 2 == 0) then
 				self.shanim = self.anim
-				self.shanim:draw(self.shadow, self.x, self.y, 0, self.scale, self.scale)
+				self.shanim:draw(shadow, self.x, self.y, 0, self.scale, self.scale)
 			end
 			love.graphics.setShader()
 		end,
@@ -78,13 +79,13 @@ function newEnemy(x, y)
 			love.graphics.draw(self.particles)
 			if self.frozen then
 				love.graphics.setColor(0.7, 0.7, 1, 1)
-				self.anim:draw(self.sprite, self.x, self.y, 0, self.scale, self.scale)
+				self.anim:draw(sprite, self.x, self.y, 0, self.scale, self.scale)
 				love.graphics.setColor(1, 1, 1, 0.5)
-				love.graphics.draw(self.ice, self.x - 4, self.y - 4, 0, self.scale - 0.2, self.scale - 0.2)
+				love.graphics.draw(ice, self.x - 4, self.y - 4, 0, self.scale - 0.2, self.scale - 0.2)
 				love.graphics.setColor(1, 1, 1, 1)
 			elseif not self.blinking or (self.blink_timer and math.floor(self.blink_timer.getTime() * 10) % 2 == 0) then
 				love.graphics.setColor(1, 1, 1, 1)
-				self.anim:draw(self.sprite, self.x, self.y, 0, self.scale, self.scale)
+				self.anim:draw(sprite, self.x, self.y, 0, self.scale, self.scale)
 			end
 			love.graphics.setShader()
 		end,
@@ -97,7 +98,6 @@ function newEnemy(x, y)
 			elseif self.dying then
 				if not self.die_timer.isExpired() then self.die_timer.update(dt) end
 				if not self.die_anim_timer.isExpired() then self.die_anim_timer.update(dt) end
-
 				if self.blinking and not self.blink_timer.isExpired() then
 					self.blink_timer.update(dt)
 				end
@@ -121,7 +121,6 @@ function newEnemy(x, y)
 		end,
 
 		jump = function(self)
-			-- jump again!!
 			table.insert(self.timings,
 				ticker.new(self.jump_time + self.jump_delay + (love.math.random() - self.jump_randomness),
 					function() self:jump() end))
@@ -199,14 +198,8 @@ function newEnemy(x, y)
 		end,
 
 		freeze = function(self)
-			--[[if not self.frozen then
-				sounds.freeze()
-				self.tint.a = 1
-				flux.to(self.tint, 0.35, { a = 0 })
-				game.cam.trauma = game.cam.trauma + 0.15
-			end]]
-			self.particles:emit(30)
 			sounds.freeze()
+			self.particles:emit(30)
 			self.frozen = true
 			self.tint.a = 1
 			flux.to(self.tint, 0.35, { a = 0 })

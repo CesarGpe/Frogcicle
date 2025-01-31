@@ -45,13 +45,25 @@ end
 function love.keypressed(key, scancode, isrepeat)
 	if key == "f11" then
 		savefile.data.fullscreen = not savefile.data.fullscreen
-		screen:setup()
+		push:switchFullscreen(WIDTH, HEIGHT)
 		savefile:save()
+	end
+	if key == "f12" then
+		savefile.data.pixelperfect = not savefile.data.pixelperfect
+		screen.setup()
+		savefile:save()
+	end
+	if key == "r" then
+		love.load()
 	end
 	if key == "-" then
 		savefile.data.debug = not savefile.data.debug
 		savefile:save()
 	end
+end
+
+function love.resize(w, h)
+	push:resize(w, h)
 end
 
 function love.update(dt)
