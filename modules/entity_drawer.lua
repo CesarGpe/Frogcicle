@@ -2,7 +2,7 @@ local drawer = {}
 local dproj_sprite = love.graphics.newImage("sprites/ice-break.png")
 
 function drawer.draw(enemies, projectiles)
-    for _, e in pairs(enemies) do
+	for _, e in pairs(enemies) do
 		e:draw_shadow()
 	end
 	player.draw_shadow()

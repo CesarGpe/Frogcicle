@@ -27,7 +27,8 @@ function newProj(x, y, dx, dy, angle)
 		end,
 
 		draw = function(self)
-			love.graphics.draw(self.sprite, self.x, self.y, self.angle, self.scale, self.scale, self.sprite:getWidth()/2, self.sprite:getHeight()/2)
+			love.graphics.draw(self.sprite, self.x, self.y, self.angle, self.scale, self.scale, self.sprite:getWidth() /
+			2, self.sprite:getHeight() / 2)
 		end,
 
 		update = function(self, dt)

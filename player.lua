@@ -42,7 +42,7 @@ function player.load()
     player.prt_shoot:setColors(1, 1, 1, 1, 1, 1, 1, 0)
 
     player.prt_trail = love.graphics.newParticleSystem(love.graphics.newImage("sprites/ice-particle.png"), 1000)
-    player.prt_trail:setEmissionArea("uniform", 3, 6, 0, true)
+    player.prt_trail:setEmissionArea("uniform", 5, 5, 0, true)
     player.prt_trail:setLinearAcceleration(-20, -20, 20, 20)
     player.prt_trail:setColors(1, 1, 1, 1, 1, 1, 1, 0)
     player.prt_trail:setParticleLifetime(0.4, 0.8)

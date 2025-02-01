@@ -115,7 +115,7 @@ function newEnemy(x, y)
 			self.y = self.body:getY() - self.offsety
 
 			self.particles:update(dt)
-    		self.particles:setPosition(self.body:getX(), self.body:getY())
+			self.particles:setPosition(self.body:getX(), self.body:getY())
 
 			self.anim:update(dt)
 		end,

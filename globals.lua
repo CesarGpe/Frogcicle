@@ -51,7 +51,7 @@ function set_globals()
 end
 
 function math.clamp(val, lower, upper)
-    assert(val and lower and upper, "there was an error lol")
-    if lower > upper then lower, upper = upper, lower end
-    return math.max(lower, math.min(upper, val))
+	assert(val and lower and upper, "there was an error lol")
+	if lower > upper then lower, upper = upper, lower end
+	return math.max(lower, math.min(upper, val))
 end

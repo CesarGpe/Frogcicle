@@ -9,13 +9,13 @@ function manager:new_proj(x, y, dx, dy, angle)
 end
 
 function manager:kill_all()
-    for i = #self.projectiles, 1, -1 do
-        self.projectiles[i]:destroy()
-    end
+	for i = #self.projectiles, 1, -1 do
+		self.projectiles[i]:destroy()
+	end
 end
 
 function manager:update()
-    for i = #self.projectiles, 1, -1 do
+	for i = #self.projectiles, 1, -1 do
 		local p = self.projectiles[i]
 		if not p.body:isDestroyed() then
 			local cons = p.body:getContacts()
