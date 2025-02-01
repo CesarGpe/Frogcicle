@@ -31,15 +31,26 @@ function player.load()
     player.fixture = love.physics.newFixture(player.body, player.shape)
     player.fixture:setRestitution(0.15)
     player.fixture:setCategory(collision_masks.player)
-    player.fixture:setMask(collision_masks.projectile)
+    player.fixture:setMask(collision_masks.proj)
 
-    player.particles = love.graphics.newParticleSystem(love.graphics.newImage("sprites/ice-particle.png"), 1000)
-    player.particles:setParticleLifetime(0.3, 0.6)
-    player.particles:setSizeVariation(1)
-    player.particles:setSpread(0.5)
-    player.particles:setSpeed(50)
-    player.particles:setSpin(10, 40)
-    player.particles:setColors(1, 1, 1, 1, 1, 1, 1, 0)
+    player.prt_shoot = love.graphics.newParticleSystem(love.graphics.newImage("sprites/ice-particle.png"), 1000)
+    player.prt_shoot:setParticleLifetime(0.3, 0.6)
+    player.prt_shoot:setSizeVariation(1)
+    player.prt_shoot:setSpread(0.5)
+    player.prt_shoot:setSpeed(50)
+    player.prt_shoot:setSpin(10, 40)
+    player.prt_shoot:setColors(1, 1, 1, 1, 1, 1, 1, 0)
+
+    player.prt_trail = love.graphics.newParticleSystem(love.graphics.newImage("sprites/ice-particle.png"), 1000)
+    player.prt_trail:setEmissionArea("uniform", 3, 6, 0, true)
+    player.prt_trail:setLinearAcceleration(-20, -20, 20, 20)
+    player.prt_trail:setColors(1, 1, 1, 1, 1, 1, 1, 0)
+    player.prt_trail:setParticleLifetime(0.4, 0.8)
+    player.prt_trail:setSizeVariation(1)
+    player.prt_trail:setSpread(5)
+    player.prt_trail:setSpeed(1)
+    player.prt_trail:setSpin(10, 40)
+    player.prt_trail:setEmissionRate(50)
 end
 
 function player.draw_shadow()
@@ -48,7 +59,8 @@ function player.draw_shadow()
 end
 
 function player.draw()
-    love.graphics.draw(player.particles)
+    love.graphics.draw(player.prt_trail)
+    love.graphics.draw(player.prt_shoot)
     player.anim:draw(player.sprite, player.x, player.y, 0, player.scale, player.scale)
 end
 
@@ -71,8 +83,8 @@ function player.controls()
 end
 
 local mousex, mousey = 0, 0
-function player.face_cursor(dt)
-    local tempx, tempy = game.mouse_position()
+function player.face_cursor()
+    local tempx, tempy = game.camera:toWorld(push:toGame(love.mouse.getPosition()))
     if tempx and tempy then
         mousex, mousey = tempx, tempy
     end
@@ -141,7 +153,6 @@ function player.face_cursor(dt)
     else
         player.anim = player.animations.yeah
     end
-    player.anim:update(dt)
 end
 
 function player.shoot()
@@ -155,10 +166,10 @@ function player.shoot()
     proj_manager:new_proj(player.body:getX() + dx, player.body:getY() + dy, dx, dy, player.angle)
 
     local m = 5
-    player.particles:setLinearAcceleration(dx*m, dy*m, dx*m, dy*m)
-    player.particles:setEmissionArea("uniform", 5, 5, player.angle, false)
-    player.particles:setDirection(player.angle)
-    player.particles:emit(15)
+    player.prt_shoot:setLinearAcceleration(dx*m, dy*m, dx*m, dy*m)
+    player.prt_shoot:setEmissionArea("uniform", 5, 5, player.angle, false)
+    player.prt_shoot:setDirection(player.angle)
+    player.prt_shoot:emit(15)
 end
 
 function player.update(dt)
@@ -170,10 +181,18 @@ function player.update(dt)
     player.y = player.body:getY() - player.offsety
 
     player.controls()
-    player.face_cursor(dt)
+    player.face_cursor()
+    player.anim:update(dt)
 
-    player.particles:update(dt)
-    player.particles:setPosition(player.body:getX(), player.body:getY())
+    player.prt_shoot:update(dt)
+    player.prt_trail:update(dt)
+    player.prt_shoot:setPosition(player.body:getX(), player.body:getY())
+    player.prt_trail:setPosition(player.body:getX(), player.body:getY() - 4)
+
+    local vx, vy = player.body:getLinearVelocity()
+    local mag = math.sqrt(vx * vx + vy * vy)
+    player.prt_trail:setEmissionRate(0.23 * mag)
+    player.prt_trail:setSpread(0.08 * mag)
 
     if love.mouse.isDown(1) and game.active and player.can_shoot and not player.shooting then
         player.shoot()

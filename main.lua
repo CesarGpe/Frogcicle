@@ -45,7 +45,7 @@ end
 function love.keypressed(key, scancode, isrepeat)
 	if key == "f11" then
 		savefile.data.fullscreen = not savefile.data.fullscreen
-		push:switchFullscreen(WIDTH, HEIGHT)
+		screen.setup()
 		savefile:save()
 	end
 	if key == "f12" then
@@ -62,23 +62,19 @@ function love.keypressed(key, scancode, isrepeat)
 	end
 end
 
-function love.resize(w, h)
-	push:resize(w, h)
-end
-
 function love.update(dt)
 	if game.active then
-		game.difficulty = game.difficulty + dt * 0.001
+		game.difficulty = game.difficulty + dt * 0.005
 		game.score = game.score + dt * math.pow(game.frozen_enemies, 1.01)
 		if game.time_left > 1 then
-			local time_change = dt * (1 - game.frozen_enemies * 0.1) * (1 + game.difficulty)
-			if game.frozen_enemies > 4 then time_change = -time_change end
-			game.time_left = game.time_left - time_change
+			game.time_left = game.time_left - dt * (1 - game.frozen_enemies * 0.2) * (1 + game.difficulty)
+			game.elapsed = game.elapsed + dt
 		else
 			ui_gameover:load()
 			flux.to(stage, 1, { dark = 1 })
 			local score = math.floor(game.score)
 			if score > savefile.data.highscore then
+				ui_gameover.new_hs = true
 				savefile.data.highscore = score
 				savefile:save()
 			end
@@ -103,6 +99,10 @@ function love.update(dt)
 	timer.update(dt)
 	flux.update(dt)
 	sounds.update()
+end
+
+function love.resize(w, h)
+	push:resize(w, h)
 end
 
 function love.draw()

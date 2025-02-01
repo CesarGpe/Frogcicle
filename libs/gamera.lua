@@ -53,23 +53,23 @@ end
 
 local function adjustPosition(self)
 	local wl, wt, ww, wh = self.wl, self.wt, self.ww, self.wh
-	local w, h         = getVisibleArea(self)
-	local w2, h2       = w * 0.5, h * 0.5
+	local w, h           = getVisibleArea(self)
+	local w2, h2         = w * 0.5, h * 0.5
 
-	local left, right  = wl + w2, wl + ww - w2
-	local top, bottom  = wt + h2, wt + wh - h2
+	local left, right    = wl + w2, wl + ww - w2
+	local top, bottom    = wt + h2, wt + wh - h2
 
-	self.x, self.y     = clamp(self.x, left, right), clamp(self.y, top, bottom)
+	self.x, self.y       = clamp(self.x, left, right), clamp(self.y, top, bottom)
 end
 
 local function adjustScale(self)
 	local w, h, ww, wh = self.w, self.h, self.ww, self.wh
-	local rw, rh    = getVisibleArea(self, 1) -- rotated frame: area around the window, rotated without scaling
-	local sx, sy    = rw / ww,
-		rh / wh                             -- vert/horiz scale: minimun scales that the window needs to occupy the world
-	local rscale    = max(sx, sy)
+	local rw, rh       = getVisibleArea(self, 1) -- rotated frame: area around the window, rotated without scaling
+	local sx, sy       = rw / ww,
+		rh / wh                            -- vert/horiz scale: minimun scales that the window needs to occupy the world
+	local rscale       = max(sx, sy)
 
-	self.scale      = max(self.scale, rscale)
+	self.scale         = max(self.scale, rscale)
 end
 
 -- Public interface
@@ -198,9 +198,13 @@ end
 
 function gamera:toWorld(x, y)
 	local scale, sin, cos = self.scale, self.sin, self.cos
-	x, y = (x - self.w2 - self.l) / scale, (y - self.h2 - self.t) / scale
-	x, y = cos * x - sin * y, sin * x + cos * y
-	return x + self.x, y + self.y
+	if x and y then
+		x, y = (x - self.w2 - self.l) / scale, (y - self.h2 - self.t) / scale
+		x, y = cos * x - sin * y, sin * x + cos * y
+		return x + self.x, y + self.y
+	else
+		return nil, nil
+	end
 end
 
 function gamera:toScreen(x, y)

@@ -26,11 +26,9 @@ function set_globals()
 		difficulty = 0,
 		score = 0,
 		frozen_enemies = 0,
-		time_left = 50,
+		time_left = 40,
+		elapsed = 0,
 		music_timer = {},
-		mouse_position = function()
-			return game.camera:toWorld(love.mouse.getPosition())
-		end
 	}
 
 	----==== MODULES & LIBRARIES ===----
@@ -40,15 +38,15 @@ function set_globals()
 	fonts = require("modules.fonts")
 	timer = require("libs.timer")
 	flux = require("libs.flux")
+	push = require("libs.push")
 
 	----==== PHYSICS VARIABLES ====----
 	world = love.physics.newWorld()
-	push = require("libs.push")
 	collision_masks = {
 		player = 1,
 		enemy = 2,
 		wall = 4,
-		projectile = 8,
+		proj = 8,
 	}
 end
 

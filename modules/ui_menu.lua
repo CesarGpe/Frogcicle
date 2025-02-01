@@ -11,10 +11,8 @@ function ui_menu:load()
     end)
 
     timer.after(0.5, function() game.can_click = true end)
-    timer.after(0.15, function()
-        flux.to(ui_menu, 0.6, { titley = self.titley + 360, introy = self.introy - 340 }):ease("elasticout")
-        flux.to(game.cam, 0.8, { zoom = 1 }):ease("elasticout")
-    end)
+    flux.to(ui_menu, 0.6, { titley = self.titley + 360, introy = self.introy - 340 }):ease("elasticout"):delay(0.15)
+    flux.to(game.cam, 0.8, { zoom = 1 }):ease("elasticout"):delay(0.15)
 end
 
 function ui_menu:intro_blink()
@@ -32,11 +30,13 @@ function ui_menu:start()
     flux.to(ui_menu, 5, { titley = self.titley - 360, introy = self.introy + 340 }):ease("elasticout")
     timer.after(0.8, function() game.menu = false end)
 
-    local ease = "backout"
-    flux.to(game.cam, 0.39, { zoom = 1.5 }):ease(ease)
-    timer.after(0.39, function() flux.to(game.cam, 0.3, { zoom = 0.75 }):ease(ease) end)
+    local e = "backout"
+    flux.to(game.cam, 0.39, { zoom = 1.5 }):ease(e):after(game.cam, 0.3, { zoom = 0.75 }):ease(e)
+        :after(game.cam, 0.3, { zoom = 0.25 }):ease(e):after(game.cam, 0.3, { zoom = 0 }):ease(e)
+
+    --[[timer.after(0.39, function() flux.to(game.cam, 0.3, { zoom = 0.75 }):ease(ease) end)
     timer.after(0.69, function() flux.to(game.cam, 0.3, { zoom = 0.25 }):ease(ease) end)
-    timer.after(0.99, function() flux.to(game.cam, 0.3, { zoom = 0 }):ease(ease) end)
+    timer.after(0.99, function() flux.to(game.cam, 0.3, { zoom = 0 }):ease(ease) end)]]
 
     timer.after(1.38, function()
         enemy_manager:init()

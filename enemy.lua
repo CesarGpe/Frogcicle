@@ -57,12 +57,12 @@ function newEnemy(x, y)
 			table.insert(self.timings, ticker.new(self.life_span, function() self:destroy() end))
 
 			self.particles:setLinearAcceleration(-20, -20, 20, 20)
+			self.particles:setColors(1, 1, 1, 1, 1, 1, 1, 0)
 			self.particles:setParticleLifetime(0.5, 1)
 			self.particles:setSizeVariation(1)
 			self.particles:setSpread(10)
 			self.particles:setSpeed(40)
 			self.particles:setSpin(10, 40)
-			self.particles:setColors(1, 1, 1, 1, 1, 1, 1, 0)
 		end,
 
 		draw_shadow = function(self)
