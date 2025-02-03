@@ -1,13 +1,13 @@
+require("entities.player")
 require("modules.sounds")
 require("modules.ticker")
 require("globals")
-require("player")
 
 local drawer = require("modules.entity_drawer")
 local screen = require("modules.screen")
 local stage = require("modules.stage")
 local debug = require("modules.debug")
-local wall = require("modules.wall")
+
 
 local ui_gameover = require("modules.ui_gameover")
 local ui_score = require("modules.ui_score")
@@ -19,16 +19,10 @@ function love.load()
 	screen.setup()
 	fonts.load()
 
-	wall.new(0, 0, 880, 1100) -- left wall
-	wall.new(1280, 0, 880, 1100) -- right wall
-	wall.new(0, 0, 1950, 435) -- up wall
-	wall.new(0, 735, 1950, 435) -- down wall
-
-	sounds.menu_music()
+	stage:load()
 	player.load()
 	ui_menu:load()
-
-	stage.dark = 0
+	sounds.menu_music()
 end
 
 function love.mousepressed(x, y, button, istouch, presses)
@@ -64,7 +58,7 @@ end
 
 function love.update(dt)
 	if game.active then
-		game.difficulty = game.difficulty + dt * 0.005
+		game.difficulty = game.difficulty + dt * 0.008
 		game.score = game.score + dt * math.pow(game.frozen_enemies, 1.01)
 		if game.time_left > 1 then
 			game.time_left = game.time_left - dt * (1 - game.frozen_enemies * 0.2) * (1 + game.difficulty)
@@ -86,7 +80,7 @@ function love.update(dt)
 	end
 
 	player.update(dt)
-	proj_manager:update()
+	proj_manager:update(dt)
 	enemy_manager:update(dt + game.difficulty * 0.001)
 
 	game.camera:setPosition(game.cam.x + game.cam.ofsx, game.cam.y + game.cam.ofsy)
@@ -114,9 +108,61 @@ end
 
 function draw_game()
 	stage:draw()
-	drawer.draw(enemy_manager.enemies, proj_manager.projectiles)
+	drawer.draw(enemy_manager.enemies, proj_manager.splashes, proj_manager.projectiles)
 
 	if savefile.data.debug then debug.draw() end
 	if game.menu then ui_menu:draw() end
 	if game.over then ui_gameover:draw() else ui_score:draw() end
+end
+
+function love.run()
+	---@diagnostic disable-next-line: redundant-parameter
+	if love.load then love.load(love.arg.parseGameArguments(arg), arg) end
+
+	-- We don't want the first frame's dt to include time taken by love.load.
+	if love.timer then love.timer.step() end
+
+	local dt = 0
+	local dt_smooth = 1 / 100
+	local run_time = 0
+
+	-- Main loop time.
+	return function()
+		run_time = love.timer.getTime()
+		-- Process events.
+		if love.event and game then
+			love.event.pump()
+			local _n, _a, _b, _c, _d, _e, _f, touched
+			for name, a, b, c, d, e, f in love.event.poll() do
+				if name == "quit" then
+					if not love.quit or not love.quit() then
+						return a or 0
+					end
+				end
+				if name == 'touchpressed' then
+					touched = true
+				elseif name == 'mousepressed' then
+					_n, _a, _b, _c, _d, _e, _f = name, a, b, c, d, e, f
+				else
+					love.handlers[name](a, b, c, d, e, f)
+				end
+			end
+			if _n then
+				love.handlers['mousepressed'](_a, _b, _c, touched)
+			end
+		end
+
+		-- Update dt, as we'll be passing it to update
+		if love.timer then dt = love.timer.step() end
+		dt_smooth = math.min(0.8 * dt_smooth + 0.2 * dt, 0.1)
+		-- Call update and draw
+		if love.update then love.update(dt_smooth) end -- will pass 0 if love.timer is disabled
+
+		if love.graphics and love.graphics.isActive() then
+			if love.draw then love.draw() end
+			love.graphics.present()
+		end
+
+		run_time = math.min(love.timer.getTime() - run_time, 0.1)
+	end
 end

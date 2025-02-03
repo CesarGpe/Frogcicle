@@ -4,7 +4,7 @@ local savefile = {
 	data = {
 		highscore = 0,
 		pixelperfect = false,
-		fullscreen = false,
+		fullscreen = true,
 		debug = false,
 	}
 }
@@ -20,8 +20,8 @@ function savefile:load()
 		local d = lume.deserialize(love.filesystem.read(file))
 		self.data = d
 	else
-		self:save()
 		print("No previous savefile found? I shall create it!!")
+		self:save()
 	end
 end
 

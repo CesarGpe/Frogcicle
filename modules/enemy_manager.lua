@@ -1,4 +1,4 @@
-require("enemy")
+require("entities.enemy")
 
 local manager = {
 	initialized = false,

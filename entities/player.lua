@@ -1,4 +1,4 @@
-require("proj")
+require("entities.proj")
 
 local anim8 = require("libs.anim8")
 player = {}
@@ -19,8 +19,8 @@ function player.load()
     player.shoot_time = 0.5
     player.proj_speed = 15
     player.timings = {}
-    player.sprite = love.graphics.newImage("sprites/cirno-sheet.png")
-    player.shadow = love.graphics.newImage("sprites/cirno-shadow.png")
+    player.sprite = love.graphics.newImage("assets/sprites/cirno-sheet.png")
+    player.shadow = love.graphics.newImage("assets/sprites/cirno-shadow.png")
     player.animations, player.anim = cirnoAnims(player.sprite)
     player.shanimations, player.shanim = cirnoAnims(player.shadow)
 
@@ -33,7 +33,7 @@ function player.load()
     player.fixture:setCategory(collision_masks.player)
     player.fixture:setMask(collision_masks.proj)
 
-    player.prt_shoot = love.graphics.newParticleSystem(love.graphics.newImage("sprites/ice-particle.png"), 1000)
+    player.prt_shoot = love.graphics.newParticleSystem(love.graphics.newImage("assets/sprites/ice-particle.png"), 1000)
     player.prt_shoot:setParticleLifetime(0.3, 0.6)
     player.prt_shoot:setSizeVariation(1)
     player.prt_shoot:setSpread(0.5)
@@ -41,7 +41,7 @@ function player.load()
     player.prt_shoot:setSpin(10, 40)
     player.prt_shoot:setColors(1, 1, 1, 1, 1, 1, 1, 0)
 
-    player.prt_trail = love.graphics.newParticleSystem(love.graphics.newImage("sprites/ice-particle.png"), 1000)
+    player.prt_trail = love.graphics.newParticleSystem(love.graphics.newImage("assets/sprites/ice-particle.png"), 1000)
     player.prt_trail:setEmissionArea("uniform", 5, 5, 0, true)
     player.prt_trail:setLinearAcceleration(-20, -20, 20, 20)
     player.prt_trail:setColors(1, 1, 1, 1, 1, 1, 1, 0)

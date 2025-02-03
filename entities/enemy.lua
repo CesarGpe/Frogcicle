@@ -1,8 +1,8 @@
 local anim8 = require("libs.anim8")
-local ice = love.graphics.newImage("sprites/frozen.png")
-local sprite = love.graphics.newImage("sprites/suwako-sheet.png")
-local shadow = love.graphics.newImage("sprites/suwako-shadow.png")
-local ice_particle = love.graphics.newImage("sprites/ice-particle.png")
+local ice = love.graphics.newImage("assets/sprites/frozen.png")
+local sprite = love.graphics.newImage("assets/sprites/suwako-sheet.png")
+local shadow = love.graphics.newImage("assets/sprites/suwako-shadow.png")
+local ice_particle = love.graphics.newImage("assets/sprites/ice-particle.png")
 
 function newEnemy(x, y)
 	return {

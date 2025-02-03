@@ -34,10 +34,6 @@ function ui_menu:start()
 	flux.to(game.cam, 0.39, { zoom = 1.5 }):ease(e):after(game.cam, 0.3, { zoom = 0.75 }):ease(e)
 		:after(game.cam, 0.3, { zoom = 0.25 }):ease(e):after(game.cam, 0.3, { zoom = 0 }):ease(e)
 
-	--[[timer.after(0.39, function() flux.to(game.cam, 0.3, { zoom = 0.75 }):ease(ease) end)
-	timer.after(0.69, function() flux.to(game.cam, 0.3, { zoom = 0.25 }):ease(ease) end)
-	timer.after(0.99, function() flux.to(game.cam, 0.3, { zoom = 0 }):ease(ease) end)]]
-
 	timer.after(1.38, function()
 		enemy_manager:init()
 		sounds.game_music()
@@ -61,7 +57,8 @@ function ui_menu:draw()
 	local title_text = "Frogcicle!"
 	local fwidth = fonts.poolparty:getWidth(title_text)
 	local fheight = fonts.paintbasic:getHeight() / 2
-	love.graphics.print(title_text, WIDTH / 2, ui_menu.titley + fheight, 0, 2, 2, fwidth / 2, fheight)
+	local rotation = math.sin(love.timer.getTime() * 1.2) * 0.05
+	love.graphics.print(title_text, WIDTH / 2, ui_menu.titley + fheight, rotation, 2, 2, fwidth / 2, fheight)
 	--love.graphics.print(title_text, WIDTH / 2 - fwidth, ui_menu.titley, 0, 2, 2)
 	love.graphics.setShader()
 
@@ -77,7 +74,7 @@ function ui_menu:draw()
 	love.graphics.setColor(1, 1, 1, 0.5)
 	local hstext = "Highscore: " .. savefile.data.highscore
 	local iwidth = fonts.paintbasic:getWidth(hstext)
-	love.graphics.print(hstext, WIDTH / 2 - iwidth / 2, ui_menu.introy + 35)
+	love.graphics.print(hstext, WIDTH / 2 - iwidth / 2, ui_menu.introy + 38)
 	love.graphics.setColor(1, 1, 1, 1)
 end
 

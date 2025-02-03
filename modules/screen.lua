@@ -2,6 +2,13 @@
 local screen = {}
 
 function screen.setup()
+	if game.mobile then
+		local screenWidth, screenHeight = love.window.getDesktopDimensions()
+		push:setupScreen(WIDTH, HEIGHT, screenWidth, screenHeight,
+			{ fullscreen = true, resizable = false, pixelperfect = false })
+		return
+	end
+
 	if savefile.data.fullscreen then
 		local screenWidth, screenHeight = love.window.getDesktopDimensions()
 		push:setupScreen(WIDTH, HEIGHT, screenWidth, screenHeight,

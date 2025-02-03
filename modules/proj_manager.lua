@@ -1,5 +1,7 @@
+local splash = require("entities.splash")
 local manager = {
-	projectiles = {}
+	projectiles = {},
+	splashes = {}
 }
 
 function manager:new_proj(x, y, dx, dy, angle)
@@ -14,7 +16,7 @@ function manager:kill_all()
 	end
 end
 
-function manager:update()
+function manager:update(dt)
 	for i = #self.projectiles, 1, -1 do
 		local p = self.projectiles[i]
 		if not p.body:isDestroyed() then
@@ -26,6 +28,9 @@ function manager:update()
 						if f:getCategory() == collision_masks.enemy then
 							f:getUserData():freeze()
 							break
+						elseif f:getCategory() == collision_masks.wall then
+							table.insert(self.splashes, splash.new(p.body:getX(), p.body:getY()))
+							break
 						end
 					end
 				end
@@ -36,6 +41,15 @@ function manager:update()
 			end
 		else
 			table.remove(self.projectiles, i)
+		end
+	end
+
+	for i = #self.splashes, 1, -1 do
+		local s = self.splashes[i]
+		s:update(dt)
+		if s.elapsed > 1 then
+			table.remove(self.splashes, i)
+			s:destroy()
 		end
 	end
 end

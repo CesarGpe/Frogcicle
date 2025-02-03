@@ -1,7 +1,7 @@
 local gamera = require("libs.gamera").new(0, 0, WIDTH, HEIGHT)
 love = require("love")
 
-function set_globals()
+function set_globals(mobile)
 	love.audio.stop()
 	love.graphics.setDefaultFilter("nearest", "nearest", 1)
 
@@ -29,6 +29,7 @@ function set_globals()
 		time_left = 40,
 		elapsed = 0,
 		music_timer = {},
+		mobile = false
 	}
 
 	----==== MODULES & LIBRARIES ===----
@@ -37,8 +38,8 @@ function set_globals()
 	savefile = require("modules.savefile")
 	fonts = require("modules.fonts")
 	timer = require("libs.timer")
-	flux = require("libs.flux")
 	push = require("libs.push")
+	flux = require("libs.flux")
 
 	----==== PHYSICS VARIABLES ====----
 	world = love.physics.newWorld()
@@ -48,6 +49,11 @@ function set_globals()
 		wall = 4,
 		proj = 8,
 	}
+
+	-- android rubbish
+	if mobile then
+		game.mobile = true
+	end
 end
 
 function math.clamp(val, lower, upper)

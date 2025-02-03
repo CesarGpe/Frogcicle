@@ -7,7 +7,7 @@ function newProj(x, y, dx, dy, angle)
 		angle = angle,
 		radius = 5,
 		scale = 0.75,
-		sprite = love.graphics.newImage("sprites/ice-shot-big.png"),
+		sprite = love.graphics.newImage("assets/sprites/ice-shot-big.png"),
 		body = {},
 		shape = {},
 		fixture = {},
