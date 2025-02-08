@@ -1,28 +1,18 @@
---local shader = love.graphics.newShader("shader/red_top.fs")
-local screen = {}
+local border_shader = love.graphics.newShader("shader/colored_border.fs")
+local screen = {
+	scale = 1,
+	border_size = 1,
+	border_color = {1, 1, 1, 1},
+}
 
 function screen.setup()
-	if game.mobile then
-		local screenWidth, screenHeight = love.window.getDesktopDimensions()
-		push:setupScreen(WIDTH, HEIGHT, screenWidth, screenHeight,
-			{ fullscreen = true, resizable = false, pixelperfect = false })
-		return
+	if not window_init then
+		love.window.setMode(WIDTH, HEIGHT, { resizable = not game.mobile, fullscreen = (savefile.data.fullscreen or game.mobile) })
+		window_init = true
 	end
 
-	if savefile.data.fullscreen then
-		local screenWidth, screenHeight = love.window.getDesktopDimensions()
-		push:setupScreen(WIDTH, HEIGHT, screenWidth, screenHeight,
-			{ fullscreen = true, resizable = false, pixelperfect = savefile.data.pixelperfect })
-		push:resize(screenWidth, screenHeight)
-	else
-		push:setupScreen(WIDTH, HEIGHT, WIDTH, HEIGHT,
-			{ fullscreen = false, resizable = false, pixelperfect = savefile.data.pixelperfect })
-		push:resize(WIDTH, HEIGHT)
-	end
-
-	--shader:send("border_color", { 0, 1, 1, 1 })
-	--shader:send("screen_size", { screen.width, screen.height })
-	--push:setShader(shader)
+	screen.border_size = 0
+	screen.border_color = {0.4, 0.9, 1, 0.5}
 end
 
 function screen.update(dt)
@@ -31,11 +21,28 @@ function screen.update(dt)
 	game.cam.angle = game.cam.trauma ^ 2 * 0.5 * love.math.random(-1, 1)
 	game.cam.ofsx = game.cam.trauma ^ 2 * love.math.random(-1, 1)
 	game.cam.ofsy = game.cam.trauma ^ 2 * love.math.random(-1, 1)
+end
 
-	--[[local seed = love.timer.getTime()
-	game.cam.angle = game.cam.trauma ^ 2 * (love.math.noise(seed, seed+3) * 2 - 1)
-	game.cam.ofsx = game.cam.trauma ^ 2 * (love.math.noise(seed+1, seed+4) * 2 - 1)
-	game.cam.ofsy = game.cam.trauma ^ 2 * (love.math.noise(seed+2, seed+5) * 2 - 1)]]
+function screen.draw(func)
+	love.graphics.setCanvas(game.canvas)
+	love.graphics.clear()
+
+	func()
+
+	love.graphics.setCanvas()
+	local maxScaleX = love.graphics.getWidth() / game.canvas:getWidth()
+	local maxScaleY = love.graphics.getHeight() / game.canvas:getHeight()
+	screen.scale = math.min(maxScaleX, maxScaleY) * game.cam.zoom
+
+	border_shader:send("border_size", screen.border_size)
+	border_shader:send("border_color", screen.border_color)
+	love.graphics.setShader(border_shader)
+
+	love.graphics.draw(game.canvas, love.graphics.getWidth() / 2 + game.cam.x + game.cam.ofsx,
+		love.graphics.getHeight() / 2 + game.cam.y + game.cam.ofsy, game.cam.angle, screen.scale, screen.scale,
+		game.canvas:getWidth() / 2, game.canvas:getHeight() / 2)
+
+	love.graphics.setShader()
 end
 
 return screen

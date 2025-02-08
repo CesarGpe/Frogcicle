@@ -12,8 +12,11 @@ end
 
 function manager:kill_all()
 	for i = #self.projectiles, 1, -1 do
-		self.projectiles[i]:destroy()
+		if not self.projectiles[i].body:isDestroyed() then
+			self.projectiles[i]:destroy()
+		end
 	end
+	self.projectiles = {}
 end
 
 function manager:update(dt)
@@ -34,8 +37,9 @@ function manager:update(dt)
 						end
 					end
 				end
-				p:destroy()
 				sounds.hit()
+				p:destroy()
+				table.remove(self.projectiles, i)
 			else
 				p:update()
 			end
@@ -48,8 +52,8 @@ function manager:update(dt)
 		local s = self.splashes[i]
 		s:update(dt)
 		if s.elapsed > 1 then
-			table.remove(self.splashes, i)
 			s:destroy()
+			table.remove(self.splashes, i)
 		end
 	end
 end

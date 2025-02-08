@@ -2,7 +2,7 @@ local anim8 = require("libs.anim8")
 local ice = love.graphics.newImage("assets/sprites/frozen.png")
 local sprite = love.graphics.newImage("assets/sprites/suwako-sheet.png")
 local shadow = love.graphics.newImage("assets/sprites/suwako-shadow.png")
-local ice_particle = love.graphics.newImage("assets/sprites/ice-particle.png")
+local particle_spr = love.graphics.newImage("assets/sprites/particle.png")
 
 function newEnemy(x, y)
 	return {
@@ -28,6 +28,7 @@ function newEnemy(x, y)
 		fixture = {},
 		timings = {},
 		ice_time = 5,
+		ice_alpha = 0.5,
 		frozen = false,
 		freeze_timer = {},
 		dying = false,
@@ -37,7 +38,8 @@ function newEnemy(x, y)
 		blink_timer = {},
 		tint = { r = 1, g = 1, b = 1, a = 0 },
 		shader = love.graphics.newShader("shader/tint.fs"),
-		particles = love.graphics.newParticleSystem(ice_particle, 1000),
+		particles = love.graphics.newParticleSystem(particle_spr, 1000),
+		prt_color = {1, 1, 1, 1},
 
 		load = function(self)
 			self.animations, self.anim = suwakoAnims(sprite)
@@ -80,7 +82,7 @@ function newEnemy(x, y)
 			if self.frozen then
 				love.graphics.setColor(0.7, 0.7, 1, 1)
 				self.anim:draw(sprite, self.x, self.y, 0, self.scale, self.scale)
-				love.graphics.setColor(1, 1, 1, 0.5)
+				love.graphics.setColor(1, 1, 1, self.ice_alpha)
 				love.graphics.draw(ice, self.x - 4, self.y - 4, 0, self.scale - 0.2, self.scale - 0.2)
 				love.graphics.setColor(1, 1, 1, 1)
 			elseif not self.blinking or (self.blink_timer and math.floor(self.blink_timer.getTime() * 10) % 2 == 0) then
@@ -95,6 +97,7 @@ function newEnemy(x, y)
 
 			if self.frozen then
 				if not self.freeze_timer.isExpired() then self.freeze_timer.update(dt) end
+				self.ice_alpha = math.min(0.65, (self.freeze_timer.getTime() / self.ice_time) + 0.2)
 			elseif self.dying then
 				if not self.die_timer.isExpired() then self.die_timer.update(dt) end
 				if not self.die_anim_timer.isExpired() then self.die_anim_timer.update(dt) end
@@ -115,6 +118,7 @@ function newEnemy(x, y)
 			self.y = self.body:getY() - self.offsety
 
 			self.particles:update(dt)
+			self.particles:setColors(self.prt_color)
 			self.particles:setPosition(self.body:getX(), self.body:getY())
 
 			self.anim:update(dt)
@@ -127,12 +131,7 @@ function newEnemy(x, y)
 
 			local mx = love.math.random(0, 1) * 2 - 1 * (1 + love.math.random())
 			local my = love.math.random(0, 1) * 2 - 1 * (1 + love.math.random())
-
-			local magnitude = math.sqrt(mx * mx + my * my)
-			if magnitude > 0 then
-				mx = mx / magnitude
-				my = my / magnitude
-			end
+			mx, my = math.norm(mx, my)
 
 			local margin = 0.35
 			if mx > -margin and mx < margin and my < 0 then
@@ -199,6 +198,7 @@ function newEnemy(x, y)
 
 		freeze = function(self)
 			sounds.freeze()
+			self.prt_color = {0.6, 0.8, 1, 0.6}
 			self.particles:emit(30)
 			self.frozen = true
 			self.tint.a = 1
@@ -207,6 +207,8 @@ function newEnemy(x, y)
 
 			self.freeze_timer = ticker.new(self.ice_time, function()
 				self.frozen = false
+				self.prt_color = {1, 1, 1, 0.5}
+				self.particles:emit(8)
 				sounds.defreeze()
 				sounds.df_chime()
 			end)

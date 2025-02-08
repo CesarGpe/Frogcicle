@@ -3,7 +3,6 @@ local file = "savedata.frg"
 local savefile = {
 	data = {
 		highscore = 0,
-		pixelperfect = false,
 		fullscreen = true,
 		debug = false,
 	}

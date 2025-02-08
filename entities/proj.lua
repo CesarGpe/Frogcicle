@@ -1,3 +1,5 @@
+local sprite = love.graphics.newImage("assets/sprites/ice-shot.png")
+
 function newProj(x, y, dx, dy, angle)
 	return {
 		x = x,
@@ -7,7 +9,6 @@ function newProj(x, y, dx, dy, angle)
 		angle = angle,
 		radius = 5,
 		scale = 0.75,
-		sprite = love.graphics.newImage("assets/sprites/ice-shot-big.png"),
 		body = {},
 		shape = {},
 		fixture = {},
@@ -27,8 +28,8 @@ function newProj(x, y, dx, dy, angle)
 		end,
 
 		draw = function(self)
-			love.graphics.draw(self.sprite, self.x, self.y, self.angle, self.scale, self.scale, self.sprite:getWidth() /
-			2, self.sprite:getHeight() / 2)
+			love.graphics.draw(sprite, self.x, self.y, self.angle, self.scale, self.scale, sprite:getWidth() /
+				2, sprite:getHeight() / 2)
 		end,
 
 		update = function(self, dt)

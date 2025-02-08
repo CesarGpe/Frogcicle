@@ -1,18 +1,27 @@
 local ui_gameover = {}
 
-function ui_gameover:load()
+function ui_gameover:load(delay)
 	self.text_alpha = 0
 	self.new_hs = false
 
-	timer.after(1, function()
-		flux.to(game.cam, 3, { x = player.body:getX(), y = player.body:getY() })
-		flux.to(game.cam, 2, { zoom = 1 })
-		game.can_click = true
+	timer.after(delay, function()
+		local t = 2
+		local playpos = { x = player.body:getX(), y = player.body:getY() }
+		flux.to(playpos, t, { x = WIDTH / 2, y = HEIGHT / 2 }):ease("sineout")
+		timer.during(t, function()
+			player.body:setX(playpos.x)
+			player.body:setY(playpos.y)
+		end)
+
+		flux.to(game.cam, t, { zoom = 4 })
+		game.waiting = true
 	end)
-	game.music_timer = ticker.new(1.5, function()
+
+	game.music_timer = ticker.new(delay + 0.5, function()
 		sounds.death_music()
 		flux.to(self, 1, { text_alpha = 1 })
 	end)
+
 	sounds.stop_game_music()
 	enemy_manager:kill_everyone()
 	proj_manager:kill_all()

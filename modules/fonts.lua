@@ -1,10 +1,6 @@
 local fonts = {}
 
 function fonts.load()
-	fonts.new("boldblocks")
-	fonts.new("cakeicing")
-	fonts.new("cleanvictory")
-	fonts.new("indigopaint")
 	fonts.new("paintbasic")
 	fonts.new("poolparty")
 end

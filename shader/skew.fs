@@ -1,8 +1,7 @@
 extern vec2 mouse_screen_pos;
-extern float hovering;
 extern float screen_scale;
+extern float hovering;
 
-#ifdef VERTEX
 vec4 position( mat4 transform_projection, vec4 vertex_position )
 {
     if (hovering <= 0.0){
@@ -15,4 +14,3 @@ vec4 position( mat4 transform_projection, vec4 vertex_position )
 
     return transform_projection * vertex_position + vec4(0.0, 0.0, 0.0, scale);
 }
-#endif
