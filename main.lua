@@ -37,20 +37,30 @@ local function pressed()
 	end
 end
 
-function love.mousereleased(x, y, button, istouch, presses)
-	pressed()
-end
-
-function love.gamepadreleased(joystick, button)
-	pressed()
-
-	if joystick:isGamepad() then
-		game.controller_mode = true
+function love.gamepadaxis(joystick, axis, value)
+	if not game.gamepad and joystick:isGamepad() then
 		game.gamepad = joystick
 	end
 end
 
+function love.gamepadreleased(joystick, button)
+	pressed()
+	if not game.gamepad and joystick:isGamepad() then
+		game.gamepad = joystick
+	end
+end
+
+function love.mousereleased(x, y, button, istouch, presses)
+	pressed()
+	game.gamepad = nil
+end
+
+function love.mousemoved(x, y, dx, dy, istouch)
+	game.gamepad = nil
+end
+
 function love.keypressed(key, scancode, isrepeat)
+	game.gamepad = nil
 	if key == "f11" then
 		savefile.data.fullscreen = not savefile.data.fullscreen
 		love.window.setFullscreen(savefile.data.fullscreen)
@@ -74,10 +84,10 @@ function love.update(dt)
 			game.time_left = game.time_left - dt * (1 - game.frozen_enemies * 0.2) * (1 + game.difficulty)
 			if game.frozen_enemies > 0 then
 				screen.border_size = math.clamp(screen.border_size, screen.border_size + 0.1 * dt,
-					game.frozen_enemies * 0.08)
+					game.frozen_enemies * 0.06)
 			else
 				screen.border_size = math.clamp(screen.border_size, screen.border_size - 0.1 * dt,
-					game.frozen_enemies * 0.08)
+					game.frozen_enemies * 0.06)
 			end
 		else
 			ui_gameover:load(1)
@@ -95,20 +105,7 @@ function love.update(dt)
 		game.music_timer.update(dt)
 	end
 
-	if game.controller_mode then
-		if not game.gamepad:isConnected() then
-			game.controller_mode = false
-			game.gamepad = {}
-			return
-		end
-		input.joysticks(game.gamepad:getAxis(1), game.gamepad:getAxis(2), game.gamepad:getAxis(3),
-			game.gamepad:getAxis(4))
-	end
-
-	if game.mobile and not game.controller_mode then
-		touch_controls:update(dt)
-	end
-
+	input.update(dt)
 	player.update(dt)
 	proj_manager:update(dt)
 	enemy_manager:update(dt + game.difficulty * 0.001)
@@ -132,44 +129,22 @@ local function draw_game()
 		ui_gameover:draw()
 	else
 		ui_score:draw()
-		if game.mobile and not game.controller_mode then
-			touch_controls.draw()
+		if game.mobile and not game.gamepad then
+			touch_controls:draw()
 		end
 	end
 
-	love.mouse.setVisible(not game.active and not game.mobile and not game.controller_mode)
-	if game.active then
-		if game.controller_mode then
-			local mx, my = input.right_joy.dx, input.right_joy.dy
-			game.crosshair.angle = game.crosshair.angle + 0.005
-			love.graphics.setColor(1, 1, 1, game.crosshair.alpha)
-			if (input.right_joy.dx ~= 0 or input.right_joy.dy ~= 0) then
-				love.graphics.draw(game.crosshair.sprite, player.body:getX() + mx * 60, player.body:getY() + my * 60,
-					game.crosshair.angle,
-					game.crosshair.scale,
-					game.crosshair.scale, game.crosshair.sprite:getWidth() / 2, game.crosshair.sprite:getHeight() / 2)
-			end
-			love.graphics.setColor(1, 1, 1, 1)
-		elseif not game.mobile then
-			local mx, my = game.mouse_position()
-			mx = math.floor(mx)
-			my = math.floor(my)
-			game.crosshair.angle = game.crosshair.angle + 0.005
-			love.graphics.setColor(1, 1, 1, game.crosshair.alpha)
-			love.graphics.draw(game.crosshair.sprite, mx, my, game.crosshair.angle, game.crosshair.scale,
-				game.crosshair.scale, game.crosshair.sprite:getWidth() / 2, game.crosshair.sprite:getHeight() / 2)
-			love.graphics.setColor(1, 1, 1, 1)
-		end
+	love.mouse.setVisible(not game.active and not game.mobile and not game.gamepad)
+	if game.active and (game.gamepad or not game.mobile) then
+		game.crosshair.angle = game.crosshair.angle + 0.005
+		love.graphics.setColor(1, 1, 1, game.crosshair.alpha)
+		love.graphics.draw(game.crosshair.sprite, game.crosshair.x, game.crosshair.y, game.crosshair.angle,
+			game.crosshair.scale,
+			game.crosshair.scale, game.crosshair.sprite:getWidth() / 2, game.crosshair.sprite:getHeight() / 2)
+		love.graphics.setColor(1, 1, 1, 1)
 	end
 end
 
 function love.draw()
 	screen.draw(draw_game)
-	--love.graphics.print(screen.border_size, 10, 10)
-	--[[if game.mobile then
-		love.graphics.print("Mobile mode active", 10, 10)
-	end
-	if game.controller_mode then
-		love.graphics.print("Controller mode active: " .. game.gamepad:getName(), 10, 30)
-	end]]
 end

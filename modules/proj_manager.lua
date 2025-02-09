@@ -1,3 +1,4 @@
+local projectile = require("entities.proj")
 local splash = require("entities.splash")
 local manager = {
 	projectiles = {},
@@ -5,8 +6,7 @@ local manager = {
 }
 
 function manager:new_proj(x, y, dx, dy, angle)
-	local proj = newProj(x, y, dx, dy, angle)
-	proj:load()
+	local proj = projectile.new(x, y, dx, dy, angle)
 	table.insert(self.projectiles, proj)
 end
 

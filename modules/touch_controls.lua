@@ -4,20 +4,18 @@ local buttons = {
 		sprite = love.graphics.newImage("assets/sprites/control.png"),
 		x = 330,
 		y = 200,
-		dx = 0,
-		dy = 0,
 		scale = 6,
 		alpha = 0,
 		hovering = 0,
 	},
 }
 
-function buttons.draw()
+function buttons:draw()
 	love.graphics.setShader(shader)
-	love.graphics.setColor(1, 1, 1, buttons.cross.alpha)
+	love.graphics.setColor(1, 1, 1, self.cross.alpha)
 
-	love.graphics.draw(buttons.cross.sprite, buttons.cross.x, buttons.cross.y, 0, buttons.cross.scale,
-		buttons.cross.scale)
+	love.graphics.draw(self.cross.sprite, self.cross.x, self.cross.y, 0, self.cross.scale,
+		self.cross.scale)
 
 	love.graphics.setColor(1, 1, 1, 1)
 	love.graphics.setShader()
@@ -49,25 +47,23 @@ function buttons:update(dt)
 		if mx > self.cross.x and mx < self.cross.x + self.cross.sprite:getWidth() * self.cross.scale and my > self.cross.y and my < self.cross.y + self.cross.sprite:getHeight() * self.cross.scale then
 			touching_cross = true
 			self.cross.hovering = math.clamp(self.cross.hovering, max, self.cross.hovering + dt * lerp)
-			input.left_joy.dx = dx
-			input.left_joy.dy = dy
+			input.move = { dx = dx, dy = dy }
 			shader:send("mouse_screen_pos", { mx, my })
 		else
 			touching_screen = true
 			local deltaX = mx - player.body:getX()
 			local deltaY = my - player.body:getY()
-			input.pew_angle = math.atan2(deltaY, deltaX)
-			input.pew = true
+			input.look = math.atan2(deltaY, deltaX)
+			input.shoot = true
 		end
 	end
 
 	if not touching_cross then
 		self.cross.hovering = math.clamp(self.cross.hovering, 0, self.cross.hovering - dt * lerp)
-		input.left_joy.dx = 0
-		input.left_joy.dy = 0
+		input.move = { dx = 0, dy = 0 }
 	end
 	if not touching_screen then
-		input.pew = false
+		input.shoot = false
 	end
 
 	shader:send("screen_scale", love.graphics.getWidth() / love.graphics.getHeight())

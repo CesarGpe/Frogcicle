@@ -1,4 +1,4 @@
-local border_shader = love.graphics.newShader("shader/colored_border.fs")
+local border_shader = love.graphics.newShader("shader/screen_fx.fs")
 local screen = {
 	scale = 1,
 	border_size = 1,

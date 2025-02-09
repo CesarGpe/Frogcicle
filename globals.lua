@@ -9,6 +9,8 @@ function set_globals(force_mobile)
 		bg = { r = 0.173, g = 0.18, b = 0.227, a = 1 },
 		crosshair = {
 			sprite = love.graphics.newImage("assets/sprites/crosshair.png"),
+			x = 0,
+			y = 0,
 			scale = 1,
 			alpha = 0.75,
 			angle = 0,
@@ -35,17 +37,9 @@ function set_globals(force_mobile)
 		time_left = 40,
 		elapsed = 0,
 		music_timer = {},
-		controller_mode = false,
-		gamepad = {},
+		gamepad = nil,
 		mobile = false
 	}
-
-	function game.mouse_position()
-		local x, y = love.mouse.getPosition()
-		local ax = (x - love.graphics.getWidth() / 2) / screen.scale + game.canvas:getWidth() / 2
-		local ay = (y - love.graphics.getHeight() / 2) / screen.scale + game.canvas:getHeight() / 2
-		return ax, ay
-	end
 
 	function game.coords(x, y)
 		local ax = (x - love.graphics.getWidth() / 2) / screen.scale + game.canvas:getWidth() / 2
@@ -97,16 +91,4 @@ end
 
 function math.mag(x, y)
 	return math.sqrt(x * x + y * y)
-end
-
-function math.length(a, b)
-	if (b == nil) then
-		b = { x = 0, y = 0 }
-	end
-	local width, height = b.x - a.x, b.y - a.y
-	return (width * width + height * height) ^ 0.5
-end
-
-function math.dot(ax, ay, bx, by)
-	return ax * bx + ay * by
 end

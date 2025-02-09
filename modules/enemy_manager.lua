@@ -1,4 +1,4 @@
-require("entities.enemy")
+local enemies = require("entities.enemy")
 
 local manager = {
 	initialized = false,
@@ -39,8 +39,7 @@ function manager:update(dt)
 end
 
 function manager:spawn_enemy()
-	local enemy = newEnemy(love.math.random(440, 680), love.math.random(218, 518))
-	enemy:load()
+	local enemy = enemies.new(love.math.random(440, 680), love.math.random(218, 518))
 	sounds.croak()
 	table.insert(self.enemies, enemy)
 	self.timer = ticker.new(self.spawnrate, function()

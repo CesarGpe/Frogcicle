@@ -1,4 +1,4 @@
-local color_wave = love.graphics.newShader("shader/color_wave.fs")
+local wave = love.graphics.newShader("shader/title_wave.fs")
 local ui_menu = {}
 
 function ui_menu:load()
@@ -53,9 +53,9 @@ function ui_menu:update(dt)
 end
 
 function ui_menu:draw()
-	color_wave:send("time", love.timer.getTime())
+	wave:send("time", love.timer.getTime())
 	love.graphics.setColor(1, 1, 1, self.alpha)
-	love.graphics.setShader(color_wave)
+	love.graphics.setShader(wave)
 	love.graphics.setFont(fonts.poolparty)
 	local title_text = "Frogcicle!"
 	local fwidth = fonts.poolparty:getWidth(title_text)

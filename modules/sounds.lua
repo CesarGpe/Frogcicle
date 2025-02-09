@@ -6,7 +6,7 @@ function sounds.leap()
 end
 
 function sounds.croak()
-	TEsound.play("assets/sound/frog-croak.ogg", "static", "croak", 0.35, 1)
+	TEsound.play("assets/sound/frog-croak.ogg", "static", "croak", 0.6, 1)
 end
 
 function sounds.shoot()

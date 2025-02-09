@@ -1,10 +1,8 @@
-require("entities.proj")
-
 local prt_sprite = love.graphics.newImage("assets/sprites/ice-particle.png")
 local anim8 = require("libs.anim8")
 player = {}
 
-local function cirnoAnims(sprite)
+local function anims(sprite)
 	local grid = anim8.newGrid(24, 32, sprite:getWidth(), sprite:getHeight())
 	local animations = {}
 
@@ -49,8 +47,8 @@ function player.load()
 	player.timings = {}
 	player.sprite = love.graphics.newImage("assets/sprites/cirno-sheet.png")
 	player.shadow = love.graphics.newImage("assets/sprites/cirno-shadow.png")
-	player.animations, player.anim = cirnoAnims(player.sprite)
-	player.shanimations, player.shanim = cirnoAnims(player.shadow)
+	player.animations, player.anim = anims(player.sprite)
+	player.shanimations, player.shanim = anims(player.shadow)
 
 	player.body = love.physics.newBody(world, player.x, player.y, "dynamic")
 	player.body:setLinearDamping(player.friction)
@@ -93,40 +91,33 @@ function player.draw()
 end
 
 function player.controls()
-	local dx, dy = 0, 0
 	if game.active and not game.transitioning then
-		if game.mobile or game.controller_mode then
-			dx = input.left_joy.dx
-			dy = input.left_joy.dy
-			player.body:applyForce(player.speed * dx, player.speed * dy)
-		else
-			if input.pressed("right") then dx = dx + 1 end
-			if input.pressed("left") then dx = dx - 1 end
-			if input.pressed("down") then dy = dy + 1 end
-			if input.pressed("up") then dy = dy - 1 end
-			dx, dy = math.norm(dx, dy)
-			player.body:applyForce(player.speed * dx, player.speed * dy)
+		player.body:applyForce(player.speed * input.move.dx, player.speed * input.move.dy)
+		if input.shoot and player.can_shoot and not player.shooting then
+			player.shoot()
 		end
-	end
-
-	if input.shoot() and game.active and player.can_shoot and not player.shooting then
-		player.shoot()
 	end
 end
 
+function player.shoot()
+	player.shooting = true
+	player.can_shoot = false
+	table.insert(player.timings, ticker.new(player.anim_time, function() player.shooting = false end))
+	table.insert(player.timings, ticker.new(player.shoot_time, function() player.can_shoot = true end))
+
+	local dx = player.proj_speed * math.cos(player.angle)
+	local dy = player.proj_speed * math.sin(player.angle)
+	proj_manager:new_proj(player.body:getX() + dx, player.body:getY() + dy, dx, dy, player.angle)
+
+	local m = 5
+	player.prt_shoot:setLinearAcceleration(dx * m, dy * m, dx * m, dy * m)
+	player.prt_shoot:setEmissionArea("uniform", 5, 5, player.angle, false)
+	player.prt_shoot:setDirection(player.angle)
+	player.prt_shoot:emit(15)
+end
+
 function player.face_cursor()
-	if game.controller_mode then
-		if (input.right_joy.dx ~= 0 or input.right_joy.dy ~= 0) then
-			player.angle = math.atan2(input.right_joy.dy, input.right_joy.dx)
-		end
-	elseif game.mobile then
-		player.angle = input.pew_angle
-	else
-		local mousex, mousey = game.mouse_position()
-		local deltaX = mousex - player.body:getX()
-		local deltaY = mousey - player.body:getY()
-		player.angle = math.atan2(deltaY, deltaX)
-	end
+	player.angle = input.look
 
 	local angleDeg = math.deg(player.angle)
 	if angleDeg < 0 then
@@ -188,23 +179,6 @@ function player.face_cursor()
 	else
 		player.anim = player.animations.yeah
 	end
-end
-
-function player.shoot()
-	player.shooting = true
-	player.can_shoot = false
-	table.insert(player.timings, ticker.new(player.anim_time, function() player.shooting = false end))
-	table.insert(player.timings, ticker.new(player.shoot_time, function() player.can_shoot = true end))
-
-	local dx = player.proj_speed * math.cos(player.angle)
-	local dy = player.proj_speed * math.sin(player.angle)
-	proj_manager:new_proj(player.body:getX() + dx, player.body:getY() + dy, dx, dy, player.angle)
-
-	local m = 5
-	player.prt_shoot:setLinearAcceleration(dx * m, dy * m, dx * m, dy * m)
-	player.prt_shoot:setEmissionArea("uniform", 5, 5, player.angle, false)
-	player.prt_shoot:setDirection(player.angle)
-	player.prt_shoot:emit(15)
 end
 
 function player.update(dt)

@@ -1,48 +1,53 @@
 local sprite = love.graphics.newImage("assets/sprites/ice-shot.png")
 
-function newProj(x, y, dx, dy, angle)
-	return {
-		x = x,
-		y = y,
-		dx = dx,
-		dy = dy,
-		angle = angle,
-		radius = 5,
-		scale = 0.75,
-		body = {},
-		shape = {},
-		fixture = {},
+local proj = {}
+proj.__index = proj
 
-		load = function(self)
-			self.body = love.physics.newBody(world, self.x, self.y, "dynamic")
-			self.body:setFixedRotation(true)
-			self.body:setBullet(true)
-			self.shape = love.physics.newCircleShape(self.radius)
-			self.fixture = love.physics.newFixture(self.body, self.shape)
-			self.fixture:setCategory(collision_masks.proj)
-			self.fixture:setMask(collision_masks.player, collision_masks.proj)
+function proj.new(x, y, dx, dy, angle)
+    local self = setmetatable({}, proj)
 
-			self.fixture:setUserData(self)
-			self.body:applyLinearImpulse(dx, dy)
-			sounds.shoot()
-		end,
+    self.x = x
+    self.y = y
+    self.dx = dx
+    self.dy = dy
+    self.angle = angle
+    self.radius = 5
+    self.scale = 0.75
+    self.body = nil
+    self.shape = nil
+    self.fixture = nil
 
-		draw = function(self)
-			love.graphics.draw(sprite, self.x, self.y, self.angle, self.scale, self.scale, sprite:getWidth() /
-				2, sprite:getHeight() / 2)
-		end,
+	self.body = love.physics.newBody(world, self.x, self.y, "dynamic")
+    self.body:setFixedRotation(true)
+    self.body:setBullet(true)
+    self.shape = love.physics.newCircleShape(self.radius)
+    self.fixture = love.physics.newFixture(self.body, self.shape)
+    self.fixture:setCategory(collision_masks.proj)
+    self.fixture:setMask(collision_masks.player, collision_masks.proj)
 
-		update = function(self, dt)
-			self.x = self.body:getX()
-			self.y = self.body:getY()
-		end,
+    self.fixture:setUserData(self)
+    self.body:applyLinearImpulse(self.dx, self.dy)
+    sounds.shoot()
 
-		destroy = function(self)
-			self.fixture:destroy()
-			self.shape = nil
-			self.body:destroy()
-		end
-	}
+    return self
 end
 
-return newProj
+function proj:draw()
+    love.graphics.draw(sprite, self.x, self.y, self.angle, self.scale, self.scale, sprite:getWidth() / 2, sprite:getHeight() / 2)
+end
+
+function proj:update(dt)
+    self.x = self.body:getX()
+    self.y = self.body:getY()
+end
+
+function proj:destroy()
+    if self.fixture then
+        self.fixture:destroy()
+        self.shape = nil
+        self.body:destroy()
+    end
+end
+
+-- Return the Projectile class for use elsewhere
+return proj
