@@ -15,6 +15,7 @@ function ui_menu:load()
 	flux.to(game.cam, 0.8, { zoom = 3 }):ease("elasticout"):delay(0.15)
 
 	touch_controls.cross.alpha = 0
+	touch_controls.joy_enabled = false
 end
 
 function ui_menu:intro_blink()
@@ -42,7 +43,9 @@ function ui_menu:start()
 		game.menu = false
 		game.active = true
 		game.transitioning = false
-		flux.to(touch_controls.cross, 0.6, { alpha = 1})
+
+		flux.to(touch_controls.cross, 1, { alpha = 1 })
+		touch_controls.joy_enabled = true
 	end)
 end
 

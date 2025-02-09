@@ -53,7 +53,9 @@ function input.update(dt)
 		end
 	elseif game.mobile then -- mobile controls
 		touch_controls:update(dt)
-	else                 -- mouse and keyboard controls
+		local dx, dy = touch_controls.joy.getAxis()
+		input.move = { dx = dx, dy = -dy }
+	else -- mouse and keyboard controls
 		local dx, dy = 0, 0
 		if input.pressed("right") then dx = dx + 1 end
 		if input.pressed("left") then dx = dx - 1 end

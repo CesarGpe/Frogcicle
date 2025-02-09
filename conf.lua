@@ -1,5 +1,6 @@
-window_init = false
+love = require("love")
 
+window_init = false
 WIDTH = 1280
 HEIGHT = 720
 

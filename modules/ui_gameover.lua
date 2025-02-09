@@ -27,6 +27,9 @@ function ui_gameover:load(delay)
 	proj_manager:kill_all()
 	game.active = false
 	game.over = true
+
+	touch_controls.joy_enabled = false
+	flux.to(touch_controls.cross, 0.6, { alpha = 0})
 end
 
 function ui_gameover:draw()

@@ -14,7 +14,7 @@ local ui_score = require("modules.ui_score")
 local ui_menu = require("modules.ui_menu")
 
 function love.load()
-	set_globals()
+	set_globals(true)
 
 	savefile:load()
 	screen.setup()
@@ -24,55 +24,6 @@ function love.load()
 	player.load()
 	ui_menu:load()
 	sounds.menu_music()
-end
-
-local function pressed()
-	if game.waiting then
-		game.waiting = false
-		if game.over then
-			love.load()
-		elseif not game.active then
-			ui_menu:start()
-		end
-	end
-end
-
-function love.gamepadaxis(joystick, axis, value)
-	if not game.gamepad and joystick:isGamepad() then
-		game.gamepad = joystick
-	end
-end
-
-function love.gamepadreleased(joystick, button)
-	pressed()
-	if not game.gamepad and joystick:isGamepad() then
-		game.gamepad = joystick
-	end
-end
-
-function love.mousereleased(x, y, button, istouch, presses)
-	pressed()
-	game.gamepad = nil
-end
-
-function love.mousemoved(x, y, dx, dy, istouch)
-	game.gamepad = nil
-end
-
-function love.keypressed(key, scancode, isrepeat)
-	game.gamepad = nil
-	if key == "f11" then
-		savefile.data.fullscreen = not savefile.data.fullscreen
-		love.window.setFullscreen(savefile.data.fullscreen)
-		savefile:save()
-	end
-	if key == "-" then
-		savefile.data.debug = not savefile.data.debug
-		savefile:save()
-	end
-	if key == "r" and savefile.data.debug then
-		love.load()
-	end
 end
 
 function love.update(dt)
@@ -129,9 +80,6 @@ local function draw_game()
 		ui_gameover:draw()
 	else
 		ui_score:draw()
-		if game.mobile and not game.gamepad then
-			touch_controls:draw()
-		end
 	end
 
 	love.mouse.setVisible(not game.active and not game.mobile and not game.gamepad)
@@ -147,4 +95,77 @@ end
 
 function love.draw()
 	screen.draw(draw_game)
+	love.graphics.print(love.timer.getFPS(), 10, 10)
+	if game.mobile and not game.gamepad then
+		touch_controls:draw()
+	end
+end
+
+function love.resize(w, h)
+	screen.fx.resize(w, h)
+end
+
+local function press()
+	if game.waiting and not touch_controls.joy.heldId then
+		game.waiting = false
+		if game.over then
+			love.load()
+		elseif not game.active then
+			ui_menu:start()
+		end
+	end
+end
+
+function love.gamepadaxis(joystick, axis, value)
+	if not game.gamepad and joystick:isGamepad() then
+		game.gamepad = joystick
+	end
+end
+
+function love.gamepadreleased(joystick, button)
+	press()
+	if not game.gamepad and joystick:isGamepad() then
+		game.gamepad = joystick
+	end
+end
+
+function love.mousereleased(x, y, button, istouch, presses)
+	press()
+	game.gamepad = nil
+end
+
+function love.mousemoved(x, y, dx, dy, istouch)
+	game.gamepad = nil
+end
+
+function love.keypressed(key, scancode, isrepeat)
+	game.gamepad = nil
+	if key == "f11" then
+		savefile.data.fullscreen = not savefile.data.fullscreen
+		love.window.setFullscreen(savefile.data.fullscreen)
+		savefile:save()
+	end
+	if key == "-" then
+		savefile.data.debug = not savefile.data.debug
+		savefile:save()
+	end
+	if key == "r" and savefile.data.debug then
+		love.load()
+	end
+end
+
+function love.touchpressed(id, x, y, dx, dy, pressure)
+	if touch_controls.joy_enabled then
+		touch_controls.joy.pressed(id, x, y, dx, dy)
+	end
+end
+
+function love.touchmoved(id, x, y, dx, dy, pressure)
+	if touch_controls.joy_enabled then
+		touch_controls.joy.moved(id, x, y, dx, dy)
+	end
+end
+
+function love.touchreleased(id, x, y, dx, dy, pressure)
+	touch_controls.joy.released(id, x, y, dx, dy)
 end

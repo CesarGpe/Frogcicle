@@ -15,7 +15,7 @@ function stage:load()
 end
 
 function stage:draw()
-	love.graphics.setBackgroundColor(game.bg.r, game.bg.g, game.bg.b)
+	--love.graphics.setBackgroundColor(game.bg.r, game.bg.g, game.bg.b)
 
 	love.graphics.setColor(game.bg.r, game.bg.g, game.bg.b)
 	love.graphics.rectangle("fill", 0, 0, WIDTH, HEIGHT)

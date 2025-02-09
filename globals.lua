@@ -1,5 +1,3 @@
-love = require("love")
-
 function set_globals(force_mobile)
 	love.audio.stop()
 
@@ -33,8 +31,7 @@ function set_globals(force_mobile)
 		score_alpha = 0,
 		score = 0,
 		frozen_enemies = 0,
-		--time_left = 999999,
-		time_left = 40,
+		time_left = 12,
 		elapsed = 0,
 		music_timer = {},
 		gamepad = nil,
@@ -74,21 +71,20 @@ function set_globals(force_mobile)
 end
 
 function math.clamp(val, lower, upper)
-	assert(val and lower and upper, "there was an error lol")
 	if lower > upper then lower, upper = upper, lower end
 	return math.max(lower, math.min(upper, val))
 end
 
-function math.norm(x, y, target)
-	target = target or 1
-	local mag = math.sqrt(x * x + y * y)
-	if mag > 0 then
-		x = (x / mag) * target
-		y = (y / mag) * target
-	end
-	return x, y
-end
-
 function math.mag(x, y)
 	return math.sqrt(x * x + y * y)
+end
+
+function math.norm(x, y, t)
+	t = t or 1
+	local m = math.mag(x, y)
+	if m > 0 then
+		x = (x / m) * t
+		y = (y / m) * t
+	end
+	return x, y
 end
