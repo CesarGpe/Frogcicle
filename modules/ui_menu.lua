@@ -69,6 +69,8 @@ function ui_menu:draw()
 
 	if ui_menu.intro_visible or game.transitioning then
 		love.graphics.setFont(fonts.paintbasic)
+		local g = screen.glow + 0.01
+		love.graphics.setColor(g, g, g, self.alpha)
 		local intro_text = "Press anywhere to start!"
 		local iwidth = fonts.paintbasic:getWidth(intro_text)
 		love.graphics.print(intro_text, WIDTH / 2 - iwidth / 2, self.introy)

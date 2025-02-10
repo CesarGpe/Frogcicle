@@ -29,7 +29,7 @@ function manager:update(dt)
 					local a, b = c:getFixtures()
 					for _, f in pairs({ a, b }) do
 						if f:getCategory() == collision_masks.enemy then
-							f:getUserData():freeze()
+							f:getUserData():freeze(p.angle)
 							break
 						elseif f:getCategory() == collision_masks.wall then
 							table.insert(self.splashes, splash.new(p.body:getX(), p.body:getY()))

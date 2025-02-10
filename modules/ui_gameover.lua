@@ -34,7 +34,8 @@ end
 
 function ui_gameover:draw()
 	love.graphics.setFont(fonts.paintbasic)
-	love.graphics.setColor(1, 1, 1, self.text_alpha)
+	local g = screen.glow + 0.01
+	love.graphics.setColor(g, g, g, self.text_alpha)
 
 	local rstext = "Press anywhere to respawn."
 	local rswidth = fonts.paintbasic:getWidth(rstext)

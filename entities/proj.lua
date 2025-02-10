@@ -25,8 +25,8 @@ function proj.new(x, y, dx, dy, angle)
     self.fixture:setCategory(collision_masks.proj)
     self.fixture:setMask(collision_masks.player, collision_masks.proj)
 
-    self.fixture:setUserData(self)
     self.body:applyLinearImpulse(self.dx, self.dy)
+    self.fixture:setUserData(self)
     sounds.shoot()
 
     return self

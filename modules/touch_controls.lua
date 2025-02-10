@@ -10,7 +10,7 @@ local buttons = {
 		alpha = 0,
 		hovering = 0,
 	},
-	joy = require("libs.Vjoy").new("fixed", 80, 80, 50, 0.05, 2),
+	joy = require("libs.Vjoy").new("fixed", 80, 80, 50, 0.05, 1),
 	joy_enabled = false
 }
 

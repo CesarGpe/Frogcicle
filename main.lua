@@ -14,7 +14,7 @@ local ui_score = require("modules.ui_score")
 local ui_menu = require("modules.ui_menu")
 
 function love.load()
-	set_globals(true)
+	set_globals()
 
 	savefile:load()
 	screen.setup()
@@ -74,8 +74,8 @@ local function draw_game()
 	drawer.draw(enemy_manager.enemies, proj_manager.splashes, proj_manager.projectiles)
 
 	if savefile.data.debug then debug.draw() end
-	if game.menu then ui_menu:draw() end
 
+	if game.menu then ui_menu:draw() end
 	if game.over then
 		ui_gameover:draw()
 	else

@@ -84,7 +84,6 @@ function enemy.new(x, y)
 	self.fixture = love.physics.newFixture(self.body, self.shape)
 	self.fixture:setRestitution(0.15)
 	self.fixture:setCategory(collision_masks.enemy)
-	self.fixture:setUserData(self)
 
 	self.jump_time = self.jump_time + (love.math.random() * 2 - 1)
 	self.life_span = self.life_span + (love.math.random() * 2 - 1)
@@ -92,13 +91,13 @@ function enemy.new(x, y)
 	table.insert(self.timings, ticker.new(self.life_span, function() self:destroy() end))
 
 	self.particles:setLinearAcceleration(-20, -20, 20, 20)
-	self.particles:setColors(1, 1, 1, 1, 1, 1, 1, 0)
 	self.particles:setParticleLifetime(0.5, 1)
 	self.particles:setSizeVariation(1)
-	self.particles:setSpread(10)
+	self.particles:setSpread(0.8)
 	self.particles:setSpeed(40)
 	self.particles:setSpin(10, 40)
 
+	self.fixture:setUserData(self)
 	return self
 end
 
@@ -153,7 +152,7 @@ function enemy:update(dt)
 	self.y = self.body:getY() - self.offsety
 
 	self.particles:update(dt)
-	self.particles:setColors(self.prt_color)
+	self.particles:setColors(self.prt_color, {1, 1, 1, 0})
 	self.particles:setPosition(self.body:getX(), self.body:getY())
 
 	self.anim:update(dt)
@@ -231,19 +230,25 @@ function enemy:jump()
 	end))
 end
 
-function enemy:freeze()
-	sounds.freeze()
+function enemy:freeze(angle)
 	self.prt_color = { 0.6, 0.8, 1, 0.6 }
+	--self.particles:setLinearAcceleration(dx * m, dy * m, dx * m, dy * m)
+	self.particles:setEmissionArea("uniform", 5, 5, angle, false)
+	self.particles:setDirection(angle)
+	self.particles:setSpread(0.8)
 	self.particles:emit(30)
+
 	self.frozen = true
 	self.tint.a = 1
 	flux.to(self.tint, 0.35, { a = 0 })
 	game.cam.trauma = game.cam.trauma + 0.16
+	sounds.freeze()
 
 	self.freeze_timer = ticker.new(self.ice_time, function()
 		self.frozen = false
 		self.prt_color = { 1, 1, 1, 0.5 }
-		self.particles:emit(8)
+		self.particles:setSpread(10)
+		self.particles:emit(10)
 		sounds.defreeze()
 		sounds.df_chime()
 	end)

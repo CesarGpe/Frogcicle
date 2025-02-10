@@ -1,7 +1,8 @@
 local ui_score = {}
 
 function ui_score:draw()
-	love.graphics.setColor(1, 1, 1, game.score_alpha)
+	local g = screen.glow + 0.01
+	love.graphics.setColor(g, g, g, game.score_alpha)
 
 	love.graphics.setFont(fonts.paintbasic)
 	local score = "Score: " .. math.floor(game.score)
@@ -16,7 +17,7 @@ function ui_score:draw()
 	local time = string.format("%02d:%02d", minleft, secleft) --[[.. " / " .. string.format("%02d:%02d", minpass, secpass)]]
 
 	--love.graphics.setColor(0.45 * game.frozen_enemies, 0.75 * game.frozen_enemies, 0.98 * game.frozen_enemies, game.score_alpha)
-	love.graphics.setColor(1 - 0.55 * game.frozen_enemies * 0.06, 1 - 0.25 * game.frozen_enemies * 0.06, 1 - 0.02 * game.frozen_enemies * 0.06, game.score_alpha)
+	--love.graphics.setColor(1 - 0.55 * game.frozen_enemies * 0.06, 1 - 0.25 * game.frozen_enemies * 0.06, 1 - 0.02 * game.frozen_enemies * 0.06, game.score_alpha)
 	local twidth = fonts.paintbasic:getWidth(time)
 	love.graphics.print(time, WIDTH / 2 - twidth / 2, HEIGHT - 536)
 	--love.graphics.print(time, WIDTH / 2 - twidth / 2, (HEIGHT / 2) - 190)
