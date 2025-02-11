@@ -13,14 +13,14 @@ function screen.setup()
 		love.window.setMode(WIDTH, HEIGHT,
 			{ resizable = not game.mobile, fullscreen = (savefile.data.fullscreen or game.mobile) })
 
-		screen.fx = moonshine(moonshine.effects.glow).chain(moonshine.effects.scanlines).chain(moonshine.effects.crt)
-			.chain(moonshine.effects.chromasep)
-		screen.fx.crt.distortionFactor = { 1.02, 1.02 }
-		screen.fx.scanlines.width = 3
-		screen.fx.scanlines.thickness = 0.8
-		screen.fx.scanlines.opacity = 0.3
-		screen.fx.scanlines.color = { 0, 20, 0 }
-		screen.fx.chromasep.radius = 2.5
+		screen.fx = moonshine(moonshine.effects.glow)--.chain(moonshine.effects.scanlines).chain(moonshine.effects.crt)
+			--.chain(moonshine.effects.chromasep)
+		--screen.fx.crt.distortionFactor = { 1.02, 1.02 }
+		--screen.fx.scanlines.width = 3
+		--screen.fx.scanlines.thickness = 0.8
+		--screen.fx.scanlines.opacity = 0.3
+		--screen.fx.scanlines.color = { 0, 20, 0 }
+		--screen.fx.chromasep.radius = 2.5
 		screen.fx.glow.min_luma = screen.glow
 		screen.fx.glow.strength = 4
 

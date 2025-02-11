@@ -97,13 +97,13 @@ end
 
 function love.draw()
 	screen.draw(draw_game)
-	--love.graphics.print(love.timer.getFPS(), 10, 10)
+	love.graphics.print(love.timer.getFPS(), 10, 10)
 	if game.mobile and not game.gamepad then
 		touch_controls:draw()
 	end
 
-	love.graphics.print("D1: " .. debug1, 10, 10)
-	love.graphics.print("D2: " .. debug2, 10, 30)
+	love.graphics.print("D1: " .. debug1, 10, 30)
+	love.graphics.print("D2: " .. debug2, 10, 50)
 end
 
 function love.resize(w, h)
