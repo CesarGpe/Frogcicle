@@ -15,7 +15,6 @@ end
 function manager:update(dt)
 	if not self.initialized then return end
 
-	self.spawnrate = math.min(5, 5 - game.difficulty * 1.5)
 	if not self.timer.isExpired() and game.active then
 		self.timer.update(dt)
 	end

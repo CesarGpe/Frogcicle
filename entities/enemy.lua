@@ -72,6 +72,7 @@ function enemy.new(x, y)
 	self.shader = love.graphics.newShader("shader/tint.fs")
 	self.particles = love.graphics.newParticleSystem(particle_spr, 1000)
 	self.prt_color = { 1, 1, 1, 1 }
+	self.hit_angle = 0
 	--------------------------------------------------------------------
 
 	self.animations, self.anim = setanims(sprite)
@@ -112,7 +113,9 @@ end
 
 function enemy:draw()
 	love.graphics.setShader(self.shader)
-	love.graphics.draw(self.particles)
+	if self.hit_angle < 0 then
+		love.graphics.draw(self.particles)
+	end
 	if self.frozen then
 		love.graphics.setColor(0.7, 0.7, 1, 1)
 		self.anim:draw(sprite, self.x, self.y, 0, self.scale, self.scale)
@@ -122,6 +125,9 @@ function enemy:draw()
 	elseif not self.blinking or (self.blink_timer and math.floor(self.blink_timer.getTime() * 10) % 2 == 0) then
 		love.graphics.setColor(1, 1, 1, 1)
 		self.anim:draw(sprite, self.x, self.y, 0, self.scale, self.scale)
+	end
+	if self.hit_angle > 0 then
+		love.graphics.draw(self.particles)
 	end
 	love.graphics.setShader()
 end
@@ -152,7 +158,7 @@ function enemy:update(dt)
 	self.y = self.body:getY() - self.offsety
 
 	self.particles:update(dt)
-	self.particles:setColors(self.prt_color, {1, 1, 1, 0})
+	self.particles:setColors(self.prt_color, { self.prt_color[1], self.prt_color[2], self.prt_color[3], 0 })
 	self.particles:setPosition(self.body:getX(), self.body:getY())
 
 	self.anim:update(dt)
@@ -231,7 +237,8 @@ function enemy:jump()
 end
 
 function enemy:freeze(angle)
-	self.prt_color = { 0.6, 0.8, 1, 0.6 }
+	self.hit_angle = angle
+	self.prt_color = { 0.7, 0.8, 1, 0.8 }
 	--self.particles:setLinearAcceleration(dx * m, dy * m, dx * m, dy * m)
 	self.particles:setEmissionArea("uniform", 5, 5, angle, false)
 	self.particles:setDirection(angle)

@@ -5,7 +5,7 @@ local screen = {
 	border_size = 1,
 	border_color = { 1, 1, 1, 1 },
 	fx = {},
-	glow = 0.8
+	glow = 0.77
 }
 
 function screen.setup()
@@ -22,7 +22,7 @@ function screen.setup()
 		screen.fx.scanlines.color = { 0, 20, 0 }
 		screen.fx.chromasep.radius = 2.5
 		screen.fx.glow.min_luma = screen.glow
-		screen.fx.glow.strength = 5
+		screen.fx.glow.strength = 4
 
 		window_init = true
 	end

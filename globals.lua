@@ -49,6 +49,9 @@ function set_globals(force_mobile)
 		game.mobile = true
 	end
 
+	debug1 = 0
+	debug2 = 0
+
 	----==== MODULES & LIBRARIES ===----
 	touch_controls = require("modules.touch_controls")
 	enemy_manager = require("modules.enemy_manager")
