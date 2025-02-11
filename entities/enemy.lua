@@ -113,7 +113,7 @@ end
 
 function enemy:draw()
 	love.graphics.setShader(self.shader)
-	if self.hit_angle < 0 then
+	if self.hit_angle <= 0 then
 		love.graphics.draw(self.particles)
 	end
 	if self.frozen then
@@ -256,6 +256,7 @@ function enemy:freeze(angle)
 		self.prt_color = { 1, 1, 1, 0.5 }
 		self.particles:setSpread(10)
 		self.particles:emit(10)
+		self.hit_angle = 0
 		sounds.defreeze()
 		sounds.df_chime()
 	end)

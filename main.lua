@@ -86,11 +86,11 @@ local function draw_game()
 
 	love.mouse.setVisible(not game.active and not game.mobile and not game.gamepad)
 	if game.active and (game.gamepad or not game.mobile) then
-		game.crosshair.angle = game.crosshair.angle + 0.005
+		game.crosshair.angle = game.crosshair.angle + 0.01
 		love.graphics.setColor(1, 1, 1, game.crosshair.alpha)
-		love.graphics.draw(game.crosshair.sprite, game.crosshair.x, game.crosshair.y, game.crosshair.angle,
-			game.crosshair.scale,
-			game.crosshair.scale, game.crosshair.sprite:getWidth() / 2, game.crosshair.sprite:getHeight() / 2)
+		love.graphics.draw(game.crosshair.sprite, math.floor(game.crosshair.x), math.floor(game.crosshair.y),
+			game.crosshair.angle, game.crosshair.scale, game.crosshair.scale, game.crosshair.sprite:getWidth() / 2,
+			game.crosshair.sprite:getHeight() / 2)
 		love.graphics.setColor(1, 1, 1, 1)
 	end
 end
@@ -107,7 +107,7 @@ function love.draw()
 end
 
 function love.resize(w, h)
-	screen.fx.resize(w, h)
+	--screen.fx.resize(w, h)
 end
 
 local function press()

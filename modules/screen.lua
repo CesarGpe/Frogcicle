@@ -1,11 +1,13 @@
-local moonshine = require("libs.moonshine")
-local border_shader = love.graphics.newShader("shader/screen_fx.fs")
+--local moonshine = require("libs.moonshine")
+--local crt_shader = love.graphics.newShader("shader/crt.fs")
+--local border_shader = love.graphics.newShader("shader/screen_border.fs")
+local screen_shader = love.graphics.newShader("shader/screen_fx.fs")
 local screen = {
 	scale = 1,
 	border_size = 1,
 	border_color = { 1, 1, 1, 1 },
 	fx = {},
-	glow = 0.77
+	glow = 1
 }
 
 function screen.setup()
@@ -13,16 +15,16 @@ function screen.setup()
 		love.window.setMode(WIDTH, HEIGHT,
 			{ resizable = not game.mobile, fullscreen = (savefile.data.fullscreen or game.mobile) })
 
-		screen.fx = moonshine(moonshine.effects.glow)--.chain(moonshine.effects.scanlines).chain(moonshine.effects.crt)
-			--.chain(moonshine.effects.chromasep)
-		--screen.fx.crt.distortionFactor = { 1.02, 1.02 }
-		--screen.fx.scanlines.width = 3
-		--screen.fx.scanlines.thickness = 0.8
-		--screen.fx.scanlines.opacity = 0.3
-		--screen.fx.scanlines.color = { 0, 20, 0 }
-		--screen.fx.chromasep.radius = 2.5
+		--[[screen.fx = moonshine(moonshine.effects.glow).chain(moonshine.effects.scanlines).chain(moonshine.effects.crt)
+			.chain(moonshine.effects.chromasep)
+		screen.fx.crt.distortionFactor = { 1.02, 1.02 }
+		screen.fx.scanlines.width = 3
+		screen.fx.scanlines.thickness = 0.8
+		screen.fx.scanlines.opacity = 0.3
+		screen.fx.scanlines.color = { 0, 20, 0 }
+		screen.fx.chromasep.radius = 2.5
 		screen.fx.glow.min_luma = screen.glow
-		screen.fx.glow.strength = 4
+		screen.fx.glow.strength = 4]]
 
 		window_init = true
 	end
@@ -50,16 +52,31 @@ function screen.draw(func)
 	local maxScaleY = love.graphics.getHeight() / game.canvas:getHeight()
 	screen.scale = math.min(maxScaleX, maxScaleY) * game.cam.zoom
 
-	border_shader:send("border_size", screen.border_size)
-	border_shader:send("border_color", screen.border_color)
+	--border_shader:send("border_size", screen.border_size)
+	--border_shader:send("border_color", screen.border_color)
 
-	love.graphics.setShader(border_shader)
+	screen_shader:send("border_size", screen.border_size)
+	screen_shader:send("border_color", screen.border_color)
+	screen_shader:send("time", love.timer.getTime())
+	screen_shader:send("distortion_fac", { 1.2, 1.2 })
+	screen_shader:send("scale_fac", { 1, 1 })
+	screen_shader:send("feather_fac", 0.01)
+	screen_shader:send("bloom_fac", 2)
+	screen_shader:send("noise_fac", 0.012)
+	screen_shader:send("crt_intensity", 0.016)
+	screen_shader:send("scanlines", game.canvas:getPixelHeight()*1.2)
+	screen_shader:send("mouse_screen_pos", {love.mouse.getPosition()})
+	screen_shader:send("screen_scale", screen.scale * game.canvas:getPixelHeight())
+	screen_shader:send("hovering", 1)
 
-	screen.fx(function()
-		love.graphics.draw(game.canvas, love.graphics.getWidth() / 2 + game.cam.x + game.cam.ofsx,
-			love.graphics.getHeight() / 2 + game.cam.y + game.cam.ofsy, game.cam.angle, screen.scale, screen.scale,
-			game.canvas:getWidth() / 2, game.canvas:getHeight() / 2)
-	end)
+	--love.graphics.setShader(border_shader)
+	love.graphics.setShader(screen_shader)
+
+	--screen.fx(function()
+	love.graphics.draw(game.canvas, love.graphics.getWidth() / 2 + game.cam.x + game.cam.ofsx,
+		love.graphics.getHeight() / 2 + game.cam.y + game.cam.ofsy, game.cam.angle, screen.scale, screen.scale,
+		game.canvas:getWidth() / 2, game.canvas:getHeight() / 2)
+	--end)
 
 	love.graphics.setShader()
 end
