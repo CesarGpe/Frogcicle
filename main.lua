@@ -1,3 +1,10 @@
+--[[
+
+TODO:
+- Tutorial!!!!!!!
+
+]]
+
 love.graphics.setDefaultFilter("nearest", "nearest", 1)
 
 require("entities.player")

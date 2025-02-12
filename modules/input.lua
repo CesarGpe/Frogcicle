@@ -11,7 +11,6 @@ local input = {
 	shoot = false,
 }
 
--- returns the value of the axis when its outside the deadzone
 local query = { 0, 0, 0, 0 }
 local deadzone = 0.1
 local function deadzone_axis(axis)
@@ -74,6 +73,7 @@ function input.update(dt)
 end
 
 function input.pressed(k)
+	---@diagnostic disable-next-line: param-type-mismatch
 	return love.keyboard.isDown(keys[k])
 end
 
