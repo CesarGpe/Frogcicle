@@ -38,7 +38,7 @@ function sounds.intro()
 end
 
 function sounds.die()
-	TEsound.play("assets/sound/die.ogg", "static", "intro", 0.35, 1)
+	TEsound.play("assets/sound/die.ogg", "static", "intro", 0.1, 1)
 end
 
 function sounds.pause()
