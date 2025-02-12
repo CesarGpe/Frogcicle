@@ -14,6 +14,7 @@ extern MY_HIGHP_OR_MEDIUMP number feather_fac;
 extern MY_HIGHP_OR_MEDIUMP number noise_fac;
 extern MY_HIGHP_OR_MEDIUMP number bloom_fac;
 extern MY_HIGHP_OR_MEDIUMP number crt_intensity;
+extern MY_HIGHP_OR_MEDIUMP number glitch_intensity;
 extern MY_HIGHP_OR_MEDIUMP number scanlines;
 
 #define BUFF 0.1
@@ -39,6 +40,32 @@ vec4 effect(vec4 color, Image tex, vec2 tc, vec2 pc)
     //undo the recenter
     tc = (tc + vec2(1.0))/2.0;
 
+	MY_HIGHP_OR_MEDIUMP number offset_l = 0.;
+    MY_HIGHP_OR_MEDIUMP number offset_r = 0.;
+    if(glitch_intensity > 0.01){
+        MY_HIGHP_OR_MEDIUMP number timefac = 3.0*time;
+        offset_l = 50.0*(-3.5+sin(timefac*0.512 + tc.y*40.0)
+                + sin(-timefac*0.8233 + tc.y*81.532)
+                + sin(timefac*0.333 + tc.y*30.3)
+                + sin(-timefac*0.1112331 + tc.y*13.0));
+        offset_r = -50.0*(-3.5+sin(timefac*0.6924 + tc.y*29.0)
+                + sin(-timefac*0.9661 + tc.y*41.532)
+                + sin(timefac*0.4423 + tc.y*40.3)
+                + sin(-timefac*0.13321312 + tc.y*11.0));
+
+        if(glitch_intensity > 1.0){
+            offset_l = 50.0*(-1.5+sin(timefac*0.512 + tc.y*4.0)
+                + sin(-timefac*0.8233 + tc.y*1.532)
+                + sin(timefac*0.333 + tc.y*3.3)
+                + sin(-timefac*0.1112331 + tc.y*1.0));
+            offset_r = -50.0*(-1.5+sin(timefac*0.6924 + tc.y*19.0)
+                + sin(-timefac*0.9661 + tc.y*21.532)
+                + sin(timefac*0.4423 + tc.y*20.3)
+                + sin(-timefac*0.13321312 + tc.y*5.0));
+        }  
+        tc.x = tc.x + 0.001*glitch_intensity*clamp(offset_l, clamp(offset_r, -1.0, 0.0), 1.0);
+    }
+
     //Apply mask and bulging effect
 	MY_HIGHP_OR_MEDIUMP vec4 crt_tex = Texel( tex, tc);
 
@@ -50,9 +77,7 @@ vec4 effect(vec4 color, Image tex, vec2 tc, vec2 pc)
 	crt_tex = vec4(new_color, crt_tex.a);
 
     //intensity multiplier for any visual artifacts
-    MY_HIGHP_OR_MEDIUMP number offset_l = 0.;
-    MY_HIGHP_OR_MEDIUMP number offset_r = 0.;
-    MY_HIGHP_OR_MEDIUMP float artifact_amplifier = (abs(clamp(offset_l, clamp(offset_r, -1.0, 0.0), 1.0)) > 0.9 ? 3. : 1.);
+    MY_HIGHP_OR_MEDIUMP float artifact_amplifier = (abs(clamp(offset_l, clamp(offset_r, -1.0, 0.0), 1.0))*glitch_intensity > 0.9 ? 3. : 1.);
 
     //Horizontal Chromatic Aberration
 	MY_HIGHP_OR_MEDIUMP float crt_amout_adjusted = (max(0., (crt_intensity)/(0.16*0.3)))*artifact_amplifier;

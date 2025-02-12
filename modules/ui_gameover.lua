@@ -18,24 +18,27 @@ function ui_gameover:load(delay)
 	end)
 
 	game.music_timer = ticker.new(delay + 0.5, function()
-		sounds.death_music()
+		sounds.death_music:setLooping(true)
+		sounds.death_music:setVolume(0.08)
+		sounds.death_music:play()
 		flux.to(self, 1, { text_alpha = 1 })
 	end)
 
-	sounds.stop_game_music()
+	sounds.die()
+	sounds.game_music:stop()
 	enemy_manager:kill_everyone()
 	proj_manager:kill_all()
 	game.active = false
 	game.over = true
+	player.die()
 
 	touch_controls.joy_enabled = false
-	flux.to(touch_controls.cross, 0.6, { alpha = 0})
+	flux.to(touch_controls, 0.6, { alpha = 0 })
 end
 
 function ui_gameover:draw()
 	love.graphics.setFont(fonts.paintbasic)
-	local g = screen.glow + 0.01
-	love.graphics.setColor(g, g, g, self.text_alpha)
+	love.graphics.setColor(1, 1, 1, self.text_alpha)
 
 	local rstext = "Press anywhere to respawn."
 	local rswidth = fonts.paintbasic:getWidth(rstext)

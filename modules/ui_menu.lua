@@ -14,7 +14,7 @@ function ui_menu:load()
 	flux.to(self, 0.6, { titley = self.titley + 360, introy = self.introy - 340 }):ease("elasticout"):delay(0.15)
 	flux.to(game.cam, 0.8, { zoom = 3 }):ease("elasticout"):delay(0.15)
 
-	touch_controls.cross.alpha = 0
+	touch_controls.alpha = 0
 	touch_controls.joy_enabled = false
 end
 
@@ -27,7 +27,7 @@ end
 
 function ui_menu:start()
 	sounds.intro()
-	sounds.stop_menu_music()
+	sounds.menu_music:stop()
 	game.transitioning = true
 	flux.to(self, 5, { titley = self.titley - 360, introy = self.introy + 340, alpha = 0 }):ease("elasticout")
 
@@ -38,13 +38,16 @@ function ui_menu:start()
 
 	timer.after(1.38, function()
 		enemy_manager:init()
-		sounds.game_music()
 		game.score = 0
 		game.menu = false
 		game.active = true
 		game.transitioning = false
 
-		flux.to(touch_controls.cross, 1, { alpha = 1 })
+		sounds.game_music:setLooping(true)
+		sounds.game_music:setVolume(0.25)
+		sounds.game_music:play()
+
+		flux.to(touch_controls, 1, { alpha = 1 })
 		touch_controls.joy_enabled = true
 	end)
 end
@@ -69,8 +72,7 @@ function ui_menu:draw()
 
 	if ui_menu.intro_visible or game.transitioning then
 		love.graphics.setFont(fonts.paintbasic)
-		local g = screen.glow + 0.01
-		love.graphics.setColor(g, g, g, self.alpha)
+		love.graphics.setColor(1, 1, 1, self.alpha)
 		local intro_text = "Press anywhere to start!"
 		local iwidth = fonts.paintbasic:getWidth(intro_text)
 		love.graphics.print(intro_text, WIDTH / 2 - iwidth / 2, self.introy)

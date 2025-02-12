@@ -1,4 +1,5 @@
 local prt_sprite = love.graphics.newImage("assets/sprites/ice-particle.png")
+local prt_power = love.graphics.newImage("assets/sprites/power.png")
 local anim8 = require("libs.anim8")
 player = {}
 
@@ -77,6 +78,15 @@ function player.load()
 	player.prt_trail:setSpeed(1)
 	player.prt_trail:setSpin(10, 40)
 	player.prt_trail:setEmissionRate(50)
+
+	player.prt_death = love.graphics.newParticleSystem(prt_power, 100)
+	player.prt_death:setLinearAcceleration(-20, -20, 20, 20)
+	player.prt_death:setColors(1, 1, 1, 1, 1, 1, 1, 0)
+	player.prt_death:setParticleLifetime(0.5, 1)
+	player.prt_death:setSizeVariation(1)
+	player.prt_death:setSpread(15)
+	player.prt_death:setSpeed(50)
+	--player.prt_death:setSpin(10, 40)
 end
 
 function player.draw_shadow()
@@ -87,6 +97,7 @@ end
 function player.draw()
 	love.graphics.draw(player.prt_trail)
 	love.graphics.draw(player.prt_shoot)
+	love.graphics.draw(player.prt_death)
 	player.anim:draw(player.sprite, player.x, player.y, 0, player.scale, player.scale)
 end
 
@@ -194,9 +205,13 @@ function player.update(dt)
 	player.anim:update(dt)
 
 	player.prt_shoot:update(dt)
-	player.prt_trail:update(dt)
 	player.prt_shoot:setPosition(player.body:getX(), player.body:getY())
+
+	player.prt_trail:update(dt)
 	player.prt_trail:setPosition(player.body:getX(), player.body:getY() - 4)
+
+	player.prt_death:update(dt)
+	player.prt_death:setPosition(player.body:getX(), player.body:getY())
 
 	local vx, vy = player.body:getLinearVelocity()
 	local mag = math.sqrt(vx * vx + vy * vy)
@@ -206,4 +221,8 @@ function player.update(dt)
 	else
 		player.prt_trail:setEmissionRate(0)
 	end
+end
+
+function player.die()
+	player.prt_death:emit(20)
 end

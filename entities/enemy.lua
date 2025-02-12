@@ -55,9 +55,9 @@ function enemy.new(x, y)
 	self.anim = {}
 	self.shanimations = {}
 	self.shanim = {}
-	self.body = {}
-	self.shape = {}
-	self.fixture = {}
+	self.body = nil
+	self.shape = nil
+	self.fixture = nil
 	self.timings = {}
 	self.ice_time = 5
 	self.ice_alpha = 0.5

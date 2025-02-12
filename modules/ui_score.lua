@@ -1,8 +1,7 @@
 local ui_score = {}
 
 function ui_score:draw()
-	local g = screen.glow + 0.01
-	love.graphics.setColor(g, g, g, game.score_alpha)
+	love.graphics.setColor(1, 1, 1, game.score_alpha)
 
 	love.graphics.setFont(fonts.paintbasic)
 	local score = "Score: " .. math.floor(game.score)

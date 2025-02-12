@@ -1,7 +1,7 @@
 local debug = {}
 
 function debug.draw()
-	love.graphics.setColor(1, 1, 1, 0.25)
+	love.graphics.setColor(1, 1, 1, 0.1)
 	love.graphics.rectangle("fill", 440, 218, 400, 300)
 	for _, body in pairs(world:getBodies()) do
 		for _, fixture in pairs(body:getFixtures()) do

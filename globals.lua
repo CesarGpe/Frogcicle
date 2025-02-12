@@ -27,6 +27,7 @@ function set_globals(force_mobile)
 		active = false,
 		menu = true,
 		over = false,
+		paused = false,
 		difficulty = 0,
 		score_alpha = 0,
 		score = 0,

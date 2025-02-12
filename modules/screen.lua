@@ -6,8 +6,8 @@ local screen = {
 	scale = 1,
 	border_size = 1,
 	border_color = { 1, 1, 1, 1 },
-	fx = {},
-	glow = 1
+	noiselvl = 0.012,
+	glitchlvl = 0,
 }
 
 function screen.setup()
@@ -61,13 +61,15 @@ function screen.draw(func)
 	screen_shader:send("distortion_fac", { 1.2, 1.2 })
 	screen_shader:send("scale_fac", { 1, 1 })
 	screen_shader:send("feather_fac", 0.01)
-	screen_shader:send("bloom_fac", 2)
-	screen_shader:send("noise_fac", 0.012)
+	screen_shader:send("noise_fac", screen.noiselvl)
 	screen_shader:send("crt_intensity", 0.016)
+	screen_shader:send("glitch_intensity", screen.glitchlvl)
 	screen_shader:send("scanlines", game.canvas:getPixelHeight()*1.2)
-	screen_shader:send("mouse_screen_pos", {love.mouse.getPosition()})
-	screen_shader:send("screen_scale", screen.scale * game.canvas:getPixelHeight())
-	screen_shader:send("hovering", 1)
+	if game.mobile then
+		screen_shader:send("bloom_fac", 0)
+	else
+		screen_shader:send("bloom_fac", 2)
+	end
 
 	--love.graphics.setShader(border_shader)
 	love.graphics.setShader(screen_shader)
