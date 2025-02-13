@@ -1,7 +1,7 @@
 local wave = love.graphics.newShader("shader/title_wave.fs")
-local ui_menu = {}
+local ui = {}
 
-function ui_menu:load()
+function ui:load()
 	self.alpha = 1
 	self.intro_visible = true
 	self.titley = (HEIGHT / 2) - 460
@@ -14,31 +14,37 @@ function ui_menu:load()
 	flux.to(self, 0.6, { titley = self.titley + 360, introy = self.introy - 340 }):ease("elasticout"):delay(0.15)
 	flux.to(game.cam, 0.8, { zoom = 3 }):ease("elasticout"):delay(0.15)
 
+	ui_gameover.text_anim = false
+	sounds.count_score:stop()
+	sounds.highscore:stop()
+
 	touch_controls.alpha = 0
 	touch_controls.joy_enabled = false
 end
 
-function ui_menu:intro_blink()
+function ui:intro_blink()
 	self.intro_visible = not self.intro_visible
 	self.blink_timer = ticker.new(0.5, function()
 		self:intro_blink()
 	end)
 end
 
-function ui_menu:start()
+function ui:start()
 	sounds.intro()
 	sounds.menu_music:stop()
 	game.transitioning = true
 	flux.to(self, 5, { titley = self.titley - 360, introy = self.introy + 340, alpha = 0 }):ease("elasticout")
 
 	local e = "backout"
-	flux.to(game, 0.6, { score_alpha = 1 }):ease(e)
-	flux.to(game.cam, 0.39, { zoom = 3.5 }):ease(e):after(game.cam, 0.3, { zoom = 2.75 }):ease(e)
-		:after(game.cam, 0.3, { zoom = 2.25 }):ease(e):after(game.cam, 0.3, { zoom = 2 }):ease(e)
+	flux.to(ui_score.time.color, 0.6, { a = 1 }):ease(e)
+	flux.to(ui_score.score.color, 0.6, { a = 1 }):ease(e)
+	flux.to(game.cam, 0.39, { zoom = 4 }):ease(e):after(game.cam, 0.3, { zoom = 3.25 }):ease(e)
+		:after(game.cam, 0.3, { zoom = 2.5 }):ease(e):after(game.cam, 0.3, { zoom = 2 }):ease(e)
+	game.cam.trauma = game.cam.trauma + 0.33
 
 	timer.after(1.38, function()
 		enemy_manager:init()
-		game.score = 0
+		game.score = 1000
 		game.menu = false
 		game.active = true
 		game.transitioning = false
@@ -52,13 +58,13 @@ function ui_menu:start()
 	end)
 end
 
-function ui_menu:update(dt)
+function ui:update(dt)
 	if not self.blink_timer.isExpired() then
 		self.blink_timer.update(dt)
 	end
 end
 
-function ui_menu:draw()
+function ui:draw()
 	wave:send("time", love.timer.getTime())
 	love.graphics.setColor(1, 1, 1, self.alpha)
 	love.graphics.setShader(wave)
@@ -70,7 +76,7 @@ function ui_menu:draw()
 	love.graphics.print(title_text, WIDTH / 2, self.titley + fheight, rotation, 2, 2, fwidth / 2, fheight)
 	love.graphics.setShader()
 
-	if ui_menu.intro_visible or game.transitioning then
+	if self.intro_visible or game.transitioning then
 		love.graphics.setFont(fonts.paintbasic)
 		love.graphics.setColor(1, 1, 1, self.alpha)
 		local intro_text = "Press anywhere to start!"
@@ -86,4 +92,4 @@ function ui_menu:draw()
 	love.graphics.setColor(1, 1, 1, 1)
 end
 
-return ui_menu
+return ui

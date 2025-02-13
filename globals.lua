@@ -29,10 +29,9 @@ function set_globals(force_mobile)
 		over = false,
 		paused = false,
 		difficulty = 0,
-		score_alpha = 0,
 		score = 0,
 		frozen_enemies = 0,
-		time_left = 40,
+		time_left = 4,
 		elapsed = 0,
 		music_timer = {},
 		gamepad = nil,
@@ -50,11 +49,14 @@ function set_globals(force_mobile)
 		game.mobile = true
 	end
 
-	debug1 = 0
-	debug2 = 0
+	----==== UI OBJECTS ===----
+	touch_controls = require("modules.touch_controls")
+	ui_gameover = require("modules.ui_gameover")
+	ui_score = require("modules.ui_score")
+	ui_pause = require("modules.ui_pause")
+	ui_menu = require("modules.ui_menu")
 
 	----==== MODULES & LIBRARIES ===----
-	touch_controls = require("modules.touch_controls")
 	enemy_manager = require("modules.enemy_manager")
 	proj_manager = require("modules.proj_manager")
 	savefile = require("modules.savefile")
@@ -72,6 +74,10 @@ function set_globals(force_mobile)
 		wall = 4,
 		proj = 8,
 	}
+
+	-- debugging rubbish
+	debug1 = 0
+	debug2 = 0
 end
 
 function math.clamp(val, lower, upper)

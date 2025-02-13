@@ -1,7 +1,11 @@
 --[[
 
 TODO:
-- Tutorial!!!!!!!
+- Make a tutorial
+- Clarify game over screen
+- Animate score number on game over
+- New record animation
+- Reduce speed when shooting?
 
 ]]
 
@@ -16,11 +20,6 @@ local drawer = require("modules.entity_drawer")
 local stage = require("modules.stage")
 local debug = require("modules.debug")
 
-local ui_gameover = require("modules.ui_gameover")
-local ui_pause = require("modules.ui_pause")
-local ui_score = require("modules.ui_score")
-local ui_menu = require("modules.ui_menu")
-
 function love.load()
 	set_globals()
 
@@ -30,7 +29,9 @@ function love.load()
 
 	stage:load()
 	player.load()
+
 	ui_menu:load()
+	ui_score:load()
 
 	sounds.menu_music:setLooping(true)
 	sounds.menu_music:setVolume(0.35)
@@ -40,6 +41,7 @@ end
 function love.update(dt)
 	input.update(dt)
 	ui_menu:update(dt)
+	ui_gameover:update(dt)
 	screen.update(dt)
 	timer.update(dt)
 	flux.update(dt)
@@ -61,13 +63,13 @@ function love.update(dt)
 					game.frozen_enemies * 0.06)
 			end
 		else
-			ui_gameover:load(1.5)
+			ui_gameover:start(1.5)
 			flux.to(stage, 1, { alpha = 0 })
 			flux.to(game.bg, 1, { r = 0, g = 0, b = 0 })
 			local score = math.floor(game.score)
 			if score > savefile.data.highscore then
-				ui_gameover.new_hs = true
 				savefile.data.highscore = score
+				ui_gameover.new_hs = true
 				savefile:save()
 			end
 		end
@@ -92,16 +94,13 @@ local function draw_game()
 	if savefile.data.debug then debug.draw() end
 
 	if game.menu then ui_menu:draw() end
-	if game.over then
-		ui_gameover:draw()
-	else
-		ui_score:draw()
-		ui_pause:draw()
-	end
+	if game.over then ui_gameover:draw() end
+	ui_score:draw()
+	ui_pause:draw()
 
 	-- lol
 	if game.menu and not game.transitioning then
-		love.graphics.draw(fish, 420, 450, 0, 1, 1)
+		love.graphics.draw(fish, 420, 450)
 	end
 	-- lmao
 
@@ -132,6 +131,7 @@ local function press()
 	if game.waiting and not touch_controls.joy.heldId then
 		game.waiting = false
 		if game.over then
+			ui_gameover.player_twn:stop()
 			love.load()
 		elseif not game.active then
 			ui_menu:start()

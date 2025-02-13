@@ -1,20 +1,25 @@
-local ui_gameover = {}
+local ui = {}
 
-function ui_gameover:load(delay)
+function ui:start(delay)
+	self.sound_pitch = 1
+	self.cur_score = 0
+	self.target_score = math.floor(game.score)
 	self.text_alpha = 0
+	self.text_anim = false
 	self.new_hs = false
+	self.player_twn = {}
 
 	timer.after(delay, function()
 		local t = 2
 		local playpos = { x = player.body:getX(), y = player.body:getY() }
-		flux.to(playpos, t, { x = WIDTH / 2, y = HEIGHT / 2 }):ease("sineout")
-		timer.during(t, function()
+		self.player_twn = flux.to(playpos, t, { x = WIDTH / 2, y = HEIGHT / 2 }):ease("sineout"):onupdate(function()
 			player.body:setX(playpos.x)
 			player.body:setY(playpos.y)
+		end):oncomplete(function ()
+			self.text_anim = true
+			game.waiting = true
 		end)
-
 		flux.to(game.cam, t, { zoom = 4 })
-		game.waiting = true
 	end)
 
 	game.music_timer = ticker.new(delay + 0.5, function()
@@ -31,12 +36,31 @@ function ui_gameover:load(delay)
 	game.active = false
 	game.over = true
 	player.die()
+	ui_score:score_anim()
 
 	touch_controls.joy_enabled = false
 	flux.to(touch_controls, 0.6, { alpha = 0 })
 end
 
-function ui_gameover:draw()
+function ui:update(dt)
+	if self.text_anim then
+		self.cur_score = self.cur_score + 500 * dt
+
+		sounds.count_score:setLooping(true)
+		sounds.count_score:setVolume(0.08)
+		sounds.count_score:play()
+
+		if self.cur_score >= self.target_score then
+			self.cur_score = self.target_score
+			self.text_anim = false
+			sounds.highscore:setVolume(0.5)
+			sounds.highscore:play()
+			sounds.count_score:stop()
+		end
+	end
+end
+
+function ui:draw()
 	love.graphics.setFont(fonts.paintbasic)
 	love.graphics.setColor(1, 1, 1, self.text_alpha)
 
@@ -44,7 +68,7 @@ function ui_gameover:draw()
 	local rswidth = fonts.paintbasic:getWidth(rstext)
 	love.graphics.print(rstext, player.x + player.offsetx - rswidth / 2, player.y - 30)
 
-	local sctext = "Score: " .. math.floor(game.score)
+	local sctext = "Score: " .. math.floor(self.cur_score)
 	local scwidth = fonts.paintbasic:getWidth(sctext)
 	love.graphics.print(sctext, player.x + player.offsetx - scwidth / 2, player.y + 50)
 
@@ -58,4 +82,4 @@ function ui_gameover:draw()
 	love.graphics.setColor(1, 1, 1, 1)
 end
 
-return ui_gameover
+return ui

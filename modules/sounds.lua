@@ -3,6 +3,8 @@ sounds = {
 	game_music = love.audio.newSource("assets/sound/game-loop.ogg", "stream"),
 	menu_music = love.audio.newSource("assets/sound/lofi-menu.ogg", "stream"),
 	death_music = love.audio.newSource("assets/sound/game-over.ogg", "stream"),
+	count_score = love.audio.newSource("assets/sound/count-score.ogg", "static"),
+	highscore = love.audio.newSource("assets/sound/highscore2.ogg", "static"),
 }
 
 function sounds.leap()
@@ -38,11 +40,11 @@ function sounds.intro()
 end
 
 function sounds.die()
-	TEsound.play("assets/sound/die.ogg", "static", "intro", 0.1, 1)
+	TEsound.play("assets/sound/die.ogg", "static", "die", 0.1, 1)
 end
 
 function sounds.pause()
-	TEsound.play("assets/sound/pause.ogg", "static", "intro", 0.25, 1)
+	TEsound.play("assets/sound/pause.ogg", "static", "pause", 0.25, 1)
 end
 
 function sounds.update()
