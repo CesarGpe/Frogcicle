@@ -39,7 +39,7 @@ end
 
 function manager:spawn_enemy()
 	local enemy = enemies.new(love.math.random(440, 680), love.math.random(218, 518))
-	sounds.croak()
+	sounds.play("frog-croak", 0.6)
 	table.insert(self.enemies, enemy)
 	self.timer = ticker.new(self.spawnrate, function()
 		self:spawn_enemy()

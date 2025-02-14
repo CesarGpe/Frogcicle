@@ -194,7 +194,7 @@ function enemy:jump()
 
 	table.insert(self.timings, ticker.new(self.jump_delay, function()
 		self.body:applyLinearImpulse(self.jump_strength * mx, self.jump_strength * my)
-		sounds.leap()
+		sounds.play("frog-leap", 0.6)
 
 		if mx > -margin and mx < margin and my < 0 then
 			self.anim = self.animations.up_jump
@@ -249,7 +249,7 @@ function enemy:freeze(angle)
 	self.tint.a = 1
 	flux.to(self.tint, 0.35, { a = 0 })
 	game.cam.trauma = game.cam.trauma + 0.16
-	sounds.freeze()
+	sounds.play("chime", 0.6)
 
 	self.freeze_timer = ticker.new(self.ice_time, function()
 		self.frozen = false
@@ -257,8 +257,11 @@ function enemy:freeze(angle)
 		self.particles:setSpread(10)
 		self.particles:emit(10)
 		self.hit_angle = 0
-		sounds.defreeze()
-		sounds.df_chime()
+		--sounds.defreeze()
+		--sounds.df_chime()
+
+		sounds.play({ "ice-crack1", "ice-crack2", "ice-crack3" })
+		sounds.play({ "ice-break1", "ice-break2", "ice-break3" })
 	end)
 end
 

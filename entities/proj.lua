@@ -27,7 +27,7 @@ function proj.new(x, y, dx, dy, angle)
 
     self.body:applyLinearImpulse(self.dx, self.dy)
     self.fixture:setUserData(self)
-    sounds.shoot()
+	sounds.play("ice-shot", 0.25)
 
     return self
 end

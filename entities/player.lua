@@ -136,7 +136,11 @@ function player.face_cursor()
 	end
 
 	if game.over then
-		player.anim = player.animations.dead
+		if ui_gameover.hs.new then
+			
+		else
+			player.anim = player.animations.dead
+		end
 	elseif not game.transitioning then
 		if angleDeg < 22.5 or angleDeg >= 337.5 then
 			if player.shooting then

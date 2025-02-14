@@ -37,7 +37,7 @@ function manager:update(dt)
 						end
 					end
 				end
-				sounds.hit()
+				sounds.play("ice-hit", 0.25)
 				p:destroy()
 				table.remove(self.projectiles, i)
 			else

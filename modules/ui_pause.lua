@@ -6,7 +6,7 @@ local ui_pause = {
 function ui_pause:switch(active)
 	-- make some sounds or animations idk
 	if active then
-		sounds.pause()
+		sounds.play("pause", 0.25)
 		sounds.game_music:pause()
 		flux.to(self, 0.15, { alpha = 1, texty = 250 })
 		flux.to(screen, 0.15, { noiselvl = 0.06, glitchlvl = 0.9 })

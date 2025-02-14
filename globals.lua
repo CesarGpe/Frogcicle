@@ -31,7 +31,7 @@ function set_globals(force_mobile)
 		difficulty = 0,
 		score = 0,
 		frozen_enemies = 0,
-		time_left = 4,
+		time_left = 40,
 		elapsed = 0,
 		music_timer = {},
 		gamepad = nil,

@@ -69,7 +69,7 @@ function love.update(dt)
 			local score = math.floor(game.score)
 			if score > savefile.data.highscore then
 				savefile.data.highscore = score
-				ui_gameover.new_hs = true
+				ui_gameover.hs.new = true
 				savefile:save()
 			end
 		end

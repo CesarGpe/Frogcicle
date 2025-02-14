@@ -14,7 +14,7 @@ function ui:load()
 	flux.to(self, 0.6, { titley = self.titley + 360, introy = self.introy - 340 }):ease("elasticout"):delay(0.15)
 	flux.to(game.cam, 0.8, { zoom = 3 }):ease("elasticout"):delay(0.15)
 
-	ui_gameover.text_anim = false
+	ui_gameover.anim = false
 	sounds.count_score:stop()
 	sounds.highscore:stop()
 
@@ -30,7 +30,7 @@ function ui:intro_blink()
 end
 
 function ui:start()
-	sounds.intro()
+	sounds.play("game-intro", 0.35)
 	sounds.menu_music:stop()
 	game.transitioning = true
 	flux.to(self, 5, { titley = self.titley - 360, introy = self.introy + 340, alpha = 0 }):ease("elasticout")
@@ -44,7 +44,7 @@ function ui:start()
 
 	timer.after(1.38, function()
 		enemy_manager:init()
-		game.score = 1000
+		game.score = 0
 		game.menu = false
 		game.active = true
 		game.transitioning = false
