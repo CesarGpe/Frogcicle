@@ -1,11 +1,16 @@
-local wave = love.graphics.newShader("shader/title_wave.fs")
+-- manages everything for the title screen
 local ui = {}
+local wave = love.graphics.newShader("shader/title_wave.fs")
 
 function ui:load()
 	self.alpha = 1
 	self.intro_visible = true
 	self.titley = (HEIGHT / 2) - 460
 	self.introy = (HEIGHT / 2) + 400
+	self.lang_button = {
+		x = 0,
+		y = 0,
+	}
 	self.blink_timer = ticker.new(0.5, function()
 		self:intro_blink()
 	end)
@@ -17,6 +22,7 @@ function ui:load()
 	ui_gameover.anim = false
 	sounds.count_score:stop()
 	sounds.highscore:stop()
+	sounds.music("menu", 0.35)
 
 	touch_controls.alpha = 0
 	touch_controls.joy_enabled = false
@@ -31,7 +37,8 @@ end
 
 function ui:start()
 	sounds.play("game-intro", 0.35)
-	sounds.menu_music:stop()
+	sounds.music()
+	game.cam.trauma = 0.37
 	game.transitioning = true
 	flux.to(self, 5, { titley = self.titley - 360, introy = self.introy + 340, alpha = 0 }):ease("elasticout")
 
@@ -40,7 +47,6 @@ function ui:start()
 	flux.to(ui_score.score.color, 0.6, { a = 1 }):ease(e)
 	flux.to(game.cam, 0.39, { zoom = 4 }):ease(e):after(game.cam, 0.3, { zoom = 3.25 }):ease(e)
 		:after(game.cam, 0.3, { zoom = 2.5 }):ease(e):after(game.cam, 0.3, { zoom = 2 }):ease(e)
-	game.cam.trauma = game.cam.trauma + 0.33
 
 	timer.after(1.38, function()
 		enemy_manager:init()
@@ -48,10 +54,7 @@ function ui:start()
 		game.menu = false
 		game.active = true
 		game.transitioning = false
-
-		sounds.game_music:setLooping(true)
-		sounds.game_music:setVolume(0.25)
-		sounds.game_music:play()
+		sounds.music("game", 0.25)
 
 		flux.to(touch_controls, 1, { alpha = 1 })
 		touch_controls.joy_enabled = true
@@ -89,6 +92,9 @@ function ui:draw()
 	local hstext = "Highscore: " .. savefile.data.highscore
 	local iwidth = fonts.paintbasic:getWidth(hstext)
 	love.graphics.print(hstext, WIDTH / 2 - iwidth / 2, self.introy + 38)
+
+	love.graphics.setColor(1, 0.5, 0.5, 1)
+	love.graphics.rectangle("fill", 640, 360, 40, 15, 4, 4, 4)
 	love.graphics.setColor(1, 1, 1, 1)
 end
 

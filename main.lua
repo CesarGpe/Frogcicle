@@ -2,18 +2,12 @@
 
 TODO:
 - Make a tutorial
-- Clarify game over screen
-- Animate score number on game over
-- New record animation
-- Reduce speed when shooting?
 
 ]]
 
 love.graphics.setDefaultFilter("nearest", "nearest", 1)
 
 require("entities.player")
-require("modules.sounds")
-require("modules.ticker")
 require("globals")
 
 local drawer = require("modules.entity_drawer")
@@ -32,15 +26,12 @@ function love.load()
 
 	ui_menu:load()
 	ui_score:load()
-
-	sounds.menu_music:setLooping(true)
-	sounds.menu_music:setVolume(0.35)
-	sounds.menu_music:play()
 end
 
 function love.update(dt)
 	input.update(dt)
 	ui_menu:update(dt)
+	ui_score:update(dt)
 	ui_gameover:update(dt)
 	screen.update(dt)
 	timer.update(dt)
@@ -55,13 +46,7 @@ function love.update(dt)
 		if game.time_left > 1 then
 			game.elapsed = game.elapsed + dt
 			game.time_left = game.time_left - dt * (1 - game.frozen_enemies * 0.2) * (1 + game.difficulty)
-			if game.frozen_enemies > 0 then
-				screen.border_size = math.clamp(screen.border_size, screen.border_size + 0.1 * dt,
-					game.frozen_enemies * 0.06)
-			else
-				screen.border_size = math.clamp(screen.border_size, screen.border_size - 0.1 * dt,
-					game.frozen_enemies * 0.06)
-			end
+			flux.to(screen, 1, { border_size = game.frozen_enemies * 0.06 })
 		else
 			ui_gameover:start(1.5)
 			flux.to(stage, 1, { alpha = 0 })
@@ -75,9 +60,6 @@ function love.update(dt)
 		end
 		debug1 = game.difficulty
 		debug2 = game.elapsed
-	end
-	if game.music_timer.update then
-		game.music_timer.update(dt)
 	end
 
 	player.update(dt)
@@ -97,7 +79,6 @@ local function draw_game()
 	if game.over then ui_gameover:draw() end
 	ui_score:draw()
 	ui_pause:draw()
-
 	-- lol
 	if game.menu and not game.transitioning then
 		love.graphics.draw(fish, 420, 450)
@@ -142,8 +123,7 @@ end
 function love.keypressed(key, scancode, isrepeat)
 	game.gamepad = nil
 	if key == "escape" and game.active then
-		game.paused = not game.paused
-		ui_pause:switch(game.paused)
+		ui_pause:switch()
 	end
 	if key == "space" then
 		press()
@@ -187,6 +167,7 @@ end
 function love.touchpressed(id, x, y, dx, dy, pressure)
 	if touch_controls.joy_enabled then
 		touch_controls.joy.pressed(id, x, y, dx, dy)
+		touch_controls:pause_button_check(id, x, y)
 	end
 end
 

@@ -1,4 +1,4 @@
-local screen_shader = love.graphics.newShader("shader/screen_fx.fs")
+-- draws the screen to fit all devices using a canvas, which also moves for screenshake
 local screen = {
 	scale = 1,
 	border_size = 1,
@@ -6,6 +6,7 @@ local screen = {
 	noiselvl = 0.012,
 	glitchlvl = 0,
 }
+local screen_shader = love.graphics.newShader("shader/screen_fx.fs")
 
 function screen.setup()
 	if not window_init then
@@ -43,15 +44,16 @@ function screen.draw(func)
 	screen_shader:send("time", love.timer.getTime())
 	screen_shader:send("distortion_fac", { 1.2, 1.2 })
 	screen_shader:send("scale_fac", { 1, 1 })
-	screen_shader:send("feather_fac", 0.01)
-	screen_shader:send("noise_fac", screen.noiselvl)
+	screen_shader:send("feather_fac", 0.7)
 	screen_shader:send("crt_intensity", 0.016)
 	screen_shader:send("glitch_intensity", screen.glitchlvl)
-	screen_shader:send("scanlines", game.canvas:getPixelHeight()*1.2)
+	screen_shader:send("scanlines", game.canvas:getPixelHeight() * 0.9)
 	if game.mobile then
 		screen_shader:send("bloom_fac", 0)
+		screen_shader:send("noise_fac", 0)
 	else
 		screen_shader:send("bloom_fac", 2)
+		screen_shader:send("noise_fac", screen.noiselvl)
 	end
 
 	love.graphics.setShader(screen_shader)

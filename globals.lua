@@ -33,7 +33,6 @@ function set_globals(force_mobile)
 		frozen_enemies = 0,
 		time_left = 40,
 		elapsed = 0,
-		music_timer = {},
 		gamepad = nil,
 		mobile = false
 	}
@@ -60,6 +59,8 @@ function set_globals(force_mobile)
 	enemy_manager = require("modules.enemy_manager")
 	proj_manager = require("modules.proj_manager")
 	savefile = require("modules.savefile")
+	sounds = require("modules.sounds")
+	ticker = require("modules.ticker")
 	screen = require("modules.screen")
 	input = require("modules.input")
 	fonts = require("modules.fonts")

@@ -49,5 +49,4 @@ function proj:destroy()
     end
 end
 
--- Return the Projectile class for use elsewhere
 return proj

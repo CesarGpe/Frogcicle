@@ -1,9 +1,9 @@
 local prt_sprite = love.graphics.newImage("assets/sprites/ice-particle.png")
 local prt_power = love.graphics.newImage("assets/sprites/power.png")
-local anim8 = require("libs.anim8")
 player = {}
 
-local function anims(sprite)
+local function setup_anims(sprite)
+	local anim8 = require("libs.anim8")
 	local grid = anim8.newGrid(24, 32, sprite:getWidth(), sprite:getHeight())
 	local animations = {}
 
@@ -25,6 +25,7 @@ local function anims(sprite)
 	animations.up_left_attack = anim8.newAnimation(grid("5-5", 8), 0.2)
 	animations.yeah = anim8.newAnimation(grid("1-4", 9), 0.2)
 	animations.dead = anim8.newAnimation(grid("5-5", 9), 1)
+	animations.dead_happy = anim8.newAnimation(grid("1-1", 10), 1)
 	local anim = animations.down
 
 	return animations, anim
@@ -48,8 +49,8 @@ function player.load()
 	player.timings = {}
 	player.sprite = love.graphics.newImage("assets/sprites/cirno-sheet.png")
 	player.shadow = love.graphics.newImage("assets/sprites/cirno-shadow.png")
-	player.animations, player.anim = anims(player.sprite)
-	player.shanimations, player.shanim = anims(player.shadow)
+	player.animations, player.anim = setup_anims(player.sprite)
+	player.shanimations, player.shanim = setup_anims(player.shadow)
 
 	player.body = love.physics.newBody(world, player.x, player.y, "dynamic")
 	player.body:setLinearDamping(player.friction)
@@ -89,18 +90,6 @@ function player.load()
 	--player.prt_death:setSpin(10, 40)
 end
 
-function player.draw_shadow()
-	player.shanim = player.anim
-	player.shanim:draw(player.shadow, player.x, player.y, 0, player.scale, player.scale)
-end
-
-function player.draw()
-	love.graphics.draw(player.prt_trail)
-	love.graphics.draw(player.prt_shoot)
-	love.graphics.draw(player.prt_death)
-	player.anim:draw(player.sprite, player.x, player.y, 0, player.scale, player.scale)
-end
-
 function player.controls()
 	if game.active and not game.transitioning then
 		player.body:applyForce(player.speed * input.move.dx, player.speed * input.move.dy)
@@ -136,11 +125,7 @@ function player.face_cursor()
 	end
 
 	if game.over then
-		if ui_gameover.hs.new then
-			
-		else
-			player.anim = player.animations.dead
-		end
+		player.anim = player.animations.dead
 	elseif not game.transitioning then
 		if angleDeg < 22.5 or angleDeg >= 337.5 then
 			if player.shooting then
@@ -196,6 +181,10 @@ function player.face_cursor()
 	end
 end
 
+function player.die()
+	player.prt_death:emit(20)
+end
+
 function player.update(dt)
 	for _, t in pairs(player.timings) do
 		if not t.isExpired() then t.update(dt) end
@@ -227,6 +216,16 @@ function player.update(dt)
 	end
 end
 
-function player.die()
-	player.prt_death:emit(20)
+function player.draw_shadow()
+	if game.over then return end
+	player.shanim = player.anim
+	player.shanim:draw(player.shadow, player.x, player.y, 0, player.scale, player.scale)
+end
+
+function player.draw()
+	if game.over and ui_gameover.hs.new and ui_gameover.anim_over then return end
+	love.graphics.draw(player.prt_trail)
+	love.graphics.draw(player.prt_shoot)
+	love.graphics.draw(player.prt_death)
+	player.anim:draw(player.sprite, player.x, player.y, 0, player.scale, player.scale)
 end

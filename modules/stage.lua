@@ -1,5 +1,7 @@
 local sprite = love.graphics.newImage("assets/sprites/house.png")
 local wall = require("modules.wall")
+
+-- the background of the game
 local stage = {
 	x = WIDTH / 2 - sprite:getWidth() / 2,
 	y = HEIGHT / 2 - sprite:getHeight() / 2,

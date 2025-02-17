@@ -149,3 +149,5 @@ function TEsound.findPitch(tag)
   end
   return 1
 end
+
+return TEsound

@@ -1,4 +1,3 @@
-local anim8 = require("libs.anim8")
 local ice = love.graphics.newImage("assets/sprites/frozen.png")
 local sprite = love.graphics.newImage("assets/sprites/suwako-sheet.png")
 local shadow = love.graphics.newImage("assets/sprites/suwako-shadow.png")
@@ -7,7 +6,8 @@ local particle_spr = love.graphics.newImage("assets/sprites/particle.png")
 local enemy = {}
 enemy.__index = enemy
 
-local function setanims(spr)
+local function setup_anims(spr)
+	local anim8 = require("libs.anim8")
 	local grid = anim8.newGrid(24, 32, spr:getWidth(), spr:getHeight())
 	local animations = {}
 
@@ -75,8 +75,8 @@ function enemy.new(x, y)
 	self.hit_angle = 0
 	--------------------------------------------------------------------
 
-	self.animations, self.anim = setanims(sprite)
-	self.shanimations, self.shanim = setanims(shadow)
+	self.animations, self.anim = setup_anims(sprite)
+	self.shanimations, self.shanim = setup_anims(shadow)
 
 	self.body = love.physics.newBody(world, self.x, self.y, "dynamic")
 	self.body:setLinearDamping(self.friction)
@@ -257,8 +257,6 @@ function enemy:freeze(angle)
 		self.particles:setSpread(10)
 		self.particles:emit(10)
 		self.hit_angle = 0
-		--sounds.defreeze()
-		--sounds.df_chime()
 
 		sounds.play({ "ice-crack1", "ice-crack2", "ice-crack3" })
 		sounds.play({ "ice-break1", "ice-break2", "ice-break3" })

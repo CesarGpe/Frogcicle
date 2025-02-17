@@ -1,8 +1,15 @@
+-- loads all fonts for ease of use
 local fonts = {}
 
 function fonts.load()
-	fonts.new("paintbasic")
-	fonts.new("poolparty")
+	local files = love.filesystem.getDirectoryItems("assets/font")
+	for _, file in pairs(files) do
+        local ext = string.sub(file, -4)
+        if ext == ".png" then
+            local font = string.sub(file, 1, -5)
+            fonts.new(font)
+        end
+    end
 end
 
 function fonts.new(name)

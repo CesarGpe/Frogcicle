@@ -1,5 +1,4 @@
-local lume = require("libs.lume")
-local file = "savedata.frg"
+-- saves and loads user data when needed
 local savefile = {
 	data = {
 		highscore = 0,
@@ -7,6 +6,9 @@ local savefile = {
 		debug = false,
 	}
 }
+
+local lume = require("libs.lume")
+local file = "savedata.frg"
 
 function savefile:save()
 	local d = self.data

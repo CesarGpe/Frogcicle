@@ -1,14 +1,15 @@
+-- basic centralized input handler for supported devices
+local input = {
+	move = { dx = 0, dy = 0 }, -- x and y vector
+	look = math.pi / 2,     -- angle in radians
+	shoot = false,
+}
+
 local keys = {
 	up = { "up", "w" },
 	down = { "down", "s" },
 	left = { "left", "a" },
 	right = { "right", "d" },
-}
-
-local input = {
-	move = { dx = 0, dy = 0 }, -- x and y vector
-	look = math.pi / 2,     -- angle in radians
-	shoot = false,
 }
 
 local query = { 0, 0, 0, 0 }

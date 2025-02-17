@@ -1,11 +1,17 @@
-require("libs.tesound")
-sounds = {
-	game_music = love.audio.newSource("assets/sound/game-loop.ogg", "stream"),
-	menu_music = love.audio.newSource("assets/sound/lofi-menu.ogg", "stream"),
-	death_music = love.audio.newSource("assets/sound/game-over.ogg", "stream"),
+local TEsound = require("libs.tesound")
+local sounds = {
 	count_score = love.audio.newSource("assets/sound/count-score.ogg", "static"),
-	count_end = love.audio.newSource("assets/sound/highscore.ogg", "static"),
-	highscore = love.audio.newSource("assets/sound/highscore2.ogg", "static"),
+	count_end = love.audio.newSource("assets/sound/count-end.ogg", "static"),
+	highscore = love.audio.newSource("assets/sound/highscore.ogg", "static"),
+
+	active_music = nil,
+	music_volume = 1,
+	music_tracks = {
+		game = love.audio.newSource("assets/sound/game-loop.ogg", "stream"),
+		menu = love.audio.newSource("assets/sound/main-menu.ogg", "stream"),
+		death = love.audio.newSource("assets/sound/game-over.ogg", "stream"),
+		high = love.audio.newSource("assets/sound/new-best.ogg", "stream"),
+	},
 }
 
 -- plays a static sound from a string, or a random sound from a list
@@ -24,14 +30,25 @@ function sounds.play(sound, volume, pitch)
 	end
 end
 
+function sounds.music(music, volume, loop)
+	volume = volume or 1
+	loop = loop or true
+
+	if sounds.active_music then sounds.active_music:pause() end
+	if music then
+		sounds.music_volume = volume
+		sounds.active_music = sounds.music_tracks[music]
+		sounds.active_music:setLooping(loop)
+		sounds.active_music:setVolume(volume)
+		sounds.active_music:play()
+	end
+end
+
 function sounds.update()
 	TEsound.cleanup()
+	if sounds.active_music then
+		sounds.active_music:setVolume(sounds.music_volume)
+	end
 end
 
-function sounds.defreeze()
-	TEsound.play({ "assets/sound/ice-crack1.ogg", "assets/sound/ice-crack2.ogg", "assets/sound/ice-crack3.ogg" }, "static", "defreeze", 1, 1)
-end
-
-function sounds.df_chime()
-	TEsound.play({ "assets/sound/ice-break1.ogg", "assets/sound/ice-break2.ogg", "assets/sound/ice-break3.ogg" }, "static", "df_chime", 0.5, 1)
-end
+return sounds

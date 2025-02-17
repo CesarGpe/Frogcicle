@@ -1,4 +1,5 @@
-ticker = {}
+-- a simple timer used for ingame interactions
+local ticker = {}
 
 -- creates a new timer, needs to be stored in a variable and manually ticked
 function ticker.new(time, callback)
@@ -23,3 +24,5 @@ function ticker.new(time, callback)
 
 	return timer
 end
+
+return ticker
