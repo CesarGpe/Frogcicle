@@ -3,6 +3,8 @@ local ui = {}
 local wave = love.graphics.newShader("shader/title_wave.fs")
 
 function ui:load()
+	self.dress = suit.new()
+
 	self.alpha = 1
 	self.intro_visible = true
 	self.titley = (HEIGHT / 2) - 460
@@ -62,8 +64,26 @@ function ui:start()
 end
 
 function ui:update(dt)
+	self.dress:updateMouse(game.coords(love.mouse.getPosition()))
 	if not self.blink_timer.isExpired() then
 		self.blink_timer.update(dt)
+	end
+	
+	local lang_swap = "English"
+	if savefile.data.lang == "en_US" then
+		lang_swap = "Español"
+	end
+	local lang_button = self.dress:Button(lang_swap, 760, self.introy + 16, 90, 40)
+	if lang_button.hit then
+		if savefile.data.lang == "en_US" then
+			savefile.data.lang = "es_MX"
+		else
+			savefile.data.lang = "en_US"
+		end
+		savefile:save()
+	end
+	if lang_button.hovered then
+		game.mouse_in_button = true
 	end
 end
 
@@ -82,20 +102,18 @@ function ui:draw()
 	if self.intro_visible or game.transitioning then
 		love.graphics.setFont(fonts.paintbasic)
 		love.graphics.setColor(1, 1, 1, self.alpha)
-		local intro_text = "Press anywhere to start!"
+		local intro_text = lang.localize("main_menu", "start_btn")
 		local iwidth = fonts.paintbasic:getWidth(intro_text)
 		love.graphics.print(intro_text, WIDTH / 2 - iwidth / 2, self.introy)
 	end
 
 	love.graphics.setFont(fonts.paintbasic)
 	love.graphics.setColor(1, 1, 1, 0.5 * self.alpha)
-	local hstext = "Highscore: " .. savefile.data.highscore
+	local hstext = lang.localize("general", "highscore") .. savefile.data.highscore
 	local iwidth = fonts.paintbasic:getWidth(hstext)
 	love.graphics.print(hstext, WIDTH / 2 - iwidth / 2, self.introy + 38)
 
-	love.graphics.setColor(1, 0.5, 0.5, 1)
-	love.graphics.rectangle("fill", 640, 360, 40, 15, 4, 4, 4)
-	love.graphics.setColor(1, 1, 1, 1)
+	self.dress:draw()
 end
 
 return ui

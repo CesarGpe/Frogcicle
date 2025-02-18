@@ -44,9 +44,10 @@ function ui:draw()
 		flux.to(self.score, 0.15, { y = HEIGHT - 190 - 4 }):ease("elasticin"):after(self.score, 0.35, { y = HEIGHT - 190 }):ease("elasticout")
 		flux.to(self.score, 0.15, { angle = 0.1 * (love.math.random() * 2 - 1) }):ease("elasticin"):after(self.score, 0.5, { angle = 0 }):ease("elasticout")
 	end
-	self.score.text = "Score: " .. cur_score
+	self.score.text = lang.localize("general", "score") .. cur_score
 	self.score:draw()
 
+	love.graphics.setFont(fonts.paintbasic)
 	love.graphics.setColor(self.time.color.r, self.time.color.g, self.time.color.b, self.time.color.a)
 	love.graphics.print(time, WIDTH / 2, HEIGHT - 536, self.time.angle, self.time.scale, self.time.scale, twidth / 2)
 

@@ -4,6 +4,7 @@ local savefile = {
 		highscore = 0,
 		fullscreen = true,
 		debug = false,
+		lang = "en_US",
 	}
 }
 
@@ -11,18 +12,22 @@ local lume = require("libs.lume")
 local file = "savedata.frg"
 
 function savefile:save()
-	local d = self.data
-	local serialize = lume.serialize(d)
+	local serialize = lume.serialize(self.data)
 	love.filesystem.write(file, serialize)
 end
 
 function savefile:load()
 	if love.filesystem.getInfo(file) then
-		local d = lume.deserialize(love.filesystem.read(file))
-		self.data = d
+		local saved = lume.deserialize(love.filesystem.read(file))
+		-- check for missing values in the save file and fill them with default ones
+		for key, value in pairs(self.data) do
+			if saved[key] == nil then
+				saved[key] = value
+			end
+		end
+		self.data = saved
 	else
-		print("No previous savefile found? I shall create it!!")
-		self:save()
+		self:save() -- make a save file because there is none
 	end
 end
 

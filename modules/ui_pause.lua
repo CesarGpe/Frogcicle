@@ -30,12 +30,12 @@ function ui_pause:draw()
 
 	love.graphics.setColor(1, 1, 1, self.alpha)
 	love.graphics.setFont(fonts.paintbasic)
-	local ptext = "Game paused."
+	local ptext = lang.localize("pause_menu", "game_paused")
 	local pwidth = fonts.paintbasic:getWidth(ptext)
 	love.graphics.print(ptext, WIDTH / 2 - pwidth / 2, self.texty)
 
 	love.graphics.setColor(1, 1, 1, self.alpha * 0.35)
-	local utext = "Esc to unpause"
+	local utext = lang.localize("pause_menu", "unpause")
 	local uwidth = fonts.paintbasic:getWidth(utext)
 	love.graphics.print(utext, WIDTH / 2 - uwidth / 2, self.texty + 30)
 

@@ -6,9 +6,12 @@ local theme = {}
 theme.cornerRadius = 8
 
 theme.color = {
-	normal  = { bg = { 0.25, 0.25, 0.25 }, fg = { 0.73, 0.73, 0.73 } },
-	hovered = { bg = { 0.19, 0.6, 0.73 }, fg = { 1, 1, 1 } },
-	active  = { bg = { 0.39, 0.87, 0.42 }, fg = { 1, 1, 1 } }
+	normal  = { bg = { 1, 0.5, 0.5 }, fg = { 1, 1, 1 } },
+	hovered = { bg = { 0.8, 0.4, 0.4 }, fg = { 1, 1, 1 } },
+	active  = { bg = { 1, 0.75, 0.75 }, fg = { 0.9, 0.9, 0.9 } },
+	--normal  = { bg = { 1, 0.5, 0.5 }, fg = { 1, 1, 1 } },
+	--hovered = { bg = { 0.19, 0.6, 0.73 }, fg = { 1, 1, 1 } },
+	--active  = { bg = { 0.39, 0.87, 0.42 }, fg = { 1, 1, 1 } }
 }
 
 
@@ -57,7 +60,7 @@ function theme.Button(text, opt, x, y, w, h)
 	love.graphics.setFont(opt.font)
 
 	y = y + theme.getVerticalOffsetForAlign(opt.valign, opt.font, h)
-	love.graphics.printf(text, x + 2, y, w - 4, opt.align or "center")
+	love.graphics.printf(text, x + 2, y, w - 6, opt.align or "center")
 end
 
 function theme.Checkbox(chk, opt, x, y, w, h)

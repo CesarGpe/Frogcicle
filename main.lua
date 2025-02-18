@@ -16,7 +16,6 @@ local debug = require("modules.debug")
 
 function love.load()
 	set_globals()
-
 	savefile:load()
 	screen.setup()
 	fonts.load()
@@ -29,17 +28,17 @@ function love.load()
 end
 
 function love.update(dt)
-	input.update(dt)
-	ui_menu:update(dt)
-	ui_score:update(dt)
-	ui_gameover:update(dt)
 	screen.update(dt)
+	input.update(dt)
 	timer.update(dt)
 	flux.update(dt)
 	sounds.update()
 
-	if game.paused then return end
+	ui_menu:update(dt)
+	ui_score:update(dt)
+	ui_gameover:update(dt)
 
+	if game.paused then return end
 	if game.active then
 		game.difficulty = game.difficulty + dt * 0.008
 		game.score = game.score + dt * math.pow(game.frozen_enemies, 1.01)
@@ -79,6 +78,7 @@ local function draw_game()
 	if game.over then ui_gameover:draw() end
 	ui_score:draw()
 	ui_pause:draw()
+
 	-- lol
 	if game.menu and not game.transitioning then
 		love.graphics.draw(fish, 420, 450)
@@ -143,7 +143,11 @@ function love.keypressed(key, scancode, isrepeat)
 end
 
 function love.mousereleased(x, y, button, istouch, presses)
-	press()
+	if game.mouse_in_button then
+		game.mouse_in_button = false
+	else
+		press()
+	end
 	game.gamepad = nil
 end
 

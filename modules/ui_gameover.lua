@@ -24,6 +24,7 @@ function ui:start(delay)
 	self.anim = false
 	self.anim_over = false
 	self.player_twn = {}
+	self.rstext = lang.localize("gameover", "respawn")
 
 	timer.after(delay, function()
 		local t = 2
@@ -146,12 +147,11 @@ function ui:update(dt)
 	end
 end
 
-local rstext = "Press anywhere to respawn."
 function ui:draw()
 	love.graphics.setFont(fonts.paintbasic)
 	love.graphics.setColor(1, 1, 1, self.alpha)
 
-	local sctext = "Score: " .. self.cur_score
+	local sctext = lang.localize("general", "score") .. self.cur_score
 	local scwidth = fonts.paintbasic:getWidth(sctext)
 	local scheight = fonts.paintbasic:getHeight()
 
@@ -159,8 +159,8 @@ function ui:draw()
 	particles:setPosition(player.x + player.offsetx, player.y + 50 + scheight / 2)
 	love.graphics.draw(particles)
 
-	local rswidth = fonts.paintbasic:getWidth(rstext)
-	love.graphics.print(rstext, player.x + player.offsetx - rswidth / 2, player.y - 30)
+	local rswidth = fonts.paintbasic:getWidth(self.rstext)
+	love.graphics.print(self.rstext, player.x + player.offsetx - rswidth / 2, player.y - 30)
 
 	love.graphics.setColor(self.score.color.r, self.score.color.g, self.score.color.b, self.alpha)
 	love.graphics.print(sctext, player.x + player.offsetx, player.y + 50 + scheight / 2, self.score.angle,
@@ -168,13 +168,13 @@ function ui:draw()
 
 	if self.hs.new and self.anim_over then
 		love.graphics.setColor(1, 1, 1, self.alpha - 0.25)
-		local hstext = "New record!"
+		local hstext = lang.localize("gameover", "new_record")
 		local hswidth = fonts.paintbasic:getWidth(hstext)
 		love.graphics.print(hstext, player.x + player.offsetx - hswidth / 2, player.y + 72, 0, 1, 1)
 
 		love.graphics.setColor(1, 1, 1, 1)
 		funky.anim:draw(funky.sprite, player.x, player.y + 4, 0, player.scale, player.scale)
-		rstext = "Press anywhere to try again!"
+		self.rstext = lang.localize("gameover", "try_again")
 	end
 
 	love.graphics.setColor(1, 1, 1, 1)

@@ -34,7 +34,8 @@ function set_globals(force_mobile)
 		time_left = 40,
 		elapsed = 0,
 		gamepad = nil,
-		mobile = false
+		mobile = false,
+		mouse_in_button = false
 	}
 
 	function game.coords(x, y)
@@ -59,6 +60,7 @@ function set_globals(force_mobile)
 	enemy_manager = require("modules.enemy_manager")
 	proj_manager = require("modules.proj_manager")
 	savefile = require("modules.savefile")
+	lang = require("modules.lang_loader")
 	sounds = require("modules.sounds")
 	ticker = require("modules.ticker")
 	screen = require("modules.screen")
@@ -66,6 +68,7 @@ function set_globals(force_mobile)
 	fonts = require("modules.fonts")
 	timer = require("libs.timer")
 	flux = require("libs.flux")
+	suit = require("libs.suit")
 
 	----==== PHYSICS VARIABLES ====----
 	world = love.physics.newWorld()
