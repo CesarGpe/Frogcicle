@@ -1,10 +1,3 @@
---[[
-
-TODO:
-- Make a tutorial
-
-]]
-
 love.graphics.setDefaultFilter("nearest", "nearest", 1)
 
 require("entities.player")
@@ -38,15 +31,19 @@ function love.update(dt)
 	ui_score:update(dt)
 	ui_gameover:update(dt)
 
+	-- pausing is pretty easy actually :smiling_imp:
 	if game.paused then return end
+
 	if game.active then
-		game.difficulty = game.difficulty + dt * 0.008
-		game.score = game.score + dt * math.pow(game.frozen_enemies, 1.01)
-		if game.time_left > 1 then
+		if game.time_left > 1 and not game.tutorial_active then
+			game.difficulty = game.difficulty + dt * 0.008
+			game.score = game.score + dt * math.pow(game.frozen_enemies, 1.01)
+
 			game.elapsed = game.elapsed + dt
 			game.time_left = game.time_left - dt * (1 - game.frozen_enemies * 0.2) * (1 + game.difficulty)
+
 			flux.to(screen, 1, { border_size = game.frozen_enemies * 0.06 })
-		else
+		elseif not game.tutorial_active then
 			ui_gameover:start(1.5)
 			flux.to(stage, 1, { alpha = 0 })
 			flux.to(game.bg, 1, { r = 0, g = 0, b = 0 })
@@ -61,6 +58,7 @@ function love.update(dt)
 		debug2 = game.elapsed
 	end
 
+	talkies.update(dt)
 	player.update(dt)
 	proj_manager:update(dt)
 	enemy_manager:update(dt + game.difficulty * 0.001)
@@ -109,6 +107,7 @@ function love.draw()
 end
 
 local function press()
+	talkies.onAction()
 	if game.waiting and not touch_controls.joy.heldId then
 		game.waiting = false
 		if game.over then
@@ -143,9 +142,7 @@ function love.keypressed(key, scancode, isrepeat)
 end
 
 function love.mousereleased(x, y, button, istouch, presses)
-	if game.mouse_in_button then
-		game.mouse_in_button = false
-	else
+	if not game.mouse_in_button then
 		press()
 	end
 	game.gamepad = nil

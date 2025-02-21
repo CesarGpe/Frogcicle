@@ -1,6 +1,8 @@
 -- the timer and score display ingame
 local ui = {}
 
+local btns = require("modules.button_prompts")
+local avatar = love.graphics.newImage("assets/sprites/icon.png")
 local prt_sprite = love.graphics.newImage("assets/sprites/particle.png")
 local particles = love.graphics.newParticleSystem(prt_sprite, 100)
 
@@ -41,8 +43,10 @@ function ui:draw()
 		self.score.color.b = 0.65
 		flux.to(self.score.color, 0.35, { b = 1 })
 
-		flux.to(self.score, 0.15, { y = HEIGHT - 190 - 4 }):ease("elasticin"):after(self.score, 0.35, { y = HEIGHT - 190 }):ease("elasticout")
-		flux.to(self.score, 0.15, { angle = 0.1 * (love.math.random() * 2 - 1) }):ease("elasticin"):after(self.score, 0.5, { angle = 0 }):ease("elasticout")
+		flux.to(self.score, 0.15, { y = HEIGHT - 190 - 4 }):ease("elasticin"):after(self.score, 0.35,
+			{ y = HEIGHT - 190 }):ease("elasticout")
+		flux.to(self.score, 0.15, { angle = 0.1 * (love.math.random() * 2 - 1) }):ease("elasticin"):after(self.score, 0.5,
+			{ angle = 0 }):ease("elasticout")
 	end
 	self.score.text = lang.localize("general", "score") .. cur_score
 	self.score:draw()
@@ -51,6 +55,11 @@ function ui:draw()
 	love.graphics.setColor(self.time.color.r, self.time.color.g, self.time.color.b, self.time.color.a)
 	love.graphics.print(time, WIDTH / 2, HEIGHT - 536, self.time.angle, self.time.scale, self.time.scale, twidth / 2)
 
+	btns.draw()
+
+	talkies.draw()
+	love.graphics.setColor(1, 1, 1, 0.8)
+	love.graphics.draw(avatar, 325, talkies.offsety + 456)
 	love.graphics.setColor(1, 1, 1, 1)
 end
 
@@ -62,6 +71,13 @@ function ui:gameover_anim()
 	timer.after(0.18, function()
 		particles:emit(60)
 	end)
+end
+
+function ui:start_anim()
+	flux.to(self.time, 0.25, { angle = 0.2 }):ease("elasticin"):after(self.time, 0.5, { angle = 0 }):ease("elasticout")
+	flux.to(self.time, 0.25, { scale = 2 }):ease("elasticin"):after(self.time, 0.5, { scale = 1 }):ease("elasticout")
+	flux.to(self.time.color, 0.25, { b = 0.5 }):ease("elasticin"):after(self.time.color, 0.5, { b = 1 }):ease(
+		"elasticout")
 end
 
 return ui

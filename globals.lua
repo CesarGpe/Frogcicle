@@ -35,7 +35,8 @@ function set_globals(force_mobile)
 		elapsed = 0,
 		gamepad = nil,
 		mobile = false,
-		mouse_in_button = false
+		tutorial_active = false,
+		mouse_in_button = false,
 	}
 
 	function game.coords(x, y)
@@ -69,6 +70,19 @@ function set_globals(force_mobile)
 	timer = require("libs.timer")
 	flux = require("libs.flux")
 	suit = require("libs.suit")
+
+	----==== TALKIES DIALOGUE SYSTEM ===----
+	talkies = require("libs.talkies")
+	talkies.offsetx = 290
+	talkies.offsety = 100
+	talkies.rounding = 12
+	talkies.thickness = 6
+	talkies.padding = 10
+	talkies.textSpeed = "medium"
+	talkies.messageBorderColor = {0, 0, 0, 1}
+	talkies.messageBackgroundColor = {0, 0, 0, 0.5}
+	talkies.talkSound = love.audio.newSource("assets/sound/cirno-talk.ogg", "static")
+	talkies.talkSound:setVolume(0.15)
 
 	----==== PHYSICS VARIABLES ====----
 	world = love.physics.newWorld()

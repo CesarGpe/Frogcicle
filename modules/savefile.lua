@@ -1,10 +1,11 @@
 -- saves and loads user data when needed
 local savefile = {
 	data = {
-		highscore = 0,
+		highscore = 99,
 		fullscreen = true,
 		debug = false,
 		lang = "en_US",
+		completed_tutorial = false,
 	}
 }
 

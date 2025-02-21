@@ -61,6 +61,29 @@ function ui:start()
 		flux.to(touch_controls, 1, { alpha = 1 })
 		touch_controls.joy_enabled = true
 	end)
+
+	if not savefile.data.completed_tutorial then
+		game.tutorial_active = true
+		timer.after(1.5, function()
+			talkies.font = fonts.paintbasic
+			flux.to(talkies, 0.5, { offsety = -10 }):ease("elasticout")
+			talkies.say("", lang.localize("tutorial", "dialogue1"))
+			talkies.say("", lang.localize("tutorial", "dialogue2"))
+			talkies.say("", lang.localize("tutorial", "dialogue3"))
+			talkies.say("", lang.localize("tutorial", "dialogue4"), {
+				oncomplete = function()
+					flux.to(talkies, 1, { offsety = 110 }):ease("elasticout")
+					ui_score:start_anim()
+					savefile.data.completed_tutorial = true
+					savefile:save()
+					timer.after(0.3, function()
+						game.tutorial_active = false
+					end)
+				end
+			})
+			talkies.say("", " ", { talkSound = nil })
+		end)
+	end
 end
 
 function ui:update(dt)
@@ -68,7 +91,7 @@ function ui:update(dt)
 	if not self.blink_timer.isExpired() then
 		self.blink_timer.update(dt)
 	end
-	
+
 	local lang_swap = "English"
 	if savefile.data.lang == "en_US" then
 		lang_swap = "Español"
@@ -82,9 +105,7 @@ function ui:update(dt)
 		end
 		savefile:save()
 	end
-	if lang_button.hovered then
-		game.mouse_in_button = true
-	end
+	game.mouse_in_button = lang_button.hovered
 end
 
 function ui:draw()
@@ -113,6 +134,7 @@ function ui:draw()
 	local iwidth = fonts.paintbasic:getWidth(hstext)
 	love.graphics.print(hstext, WIDTH / 2 - iwidth / 2, self.introy + 38)
 
+	love.graphics.setColor(1, 1, 1, 1)
 	self.dress:draw()
 end
 
