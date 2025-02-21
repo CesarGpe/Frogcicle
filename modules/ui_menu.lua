@@ -62,7 +62,7 @@ function ui:start()
 		touch_controls.joy_enabled = true
 	end)
 
-	if not savefile.data.completed_tutorial then
+	if not savefile.data.completed_tutorial or savefile.data.debug then
 		game.tutorial_active = true
 		timer.after(1.5, function()
 			talkies.font = fonts.paintbasic

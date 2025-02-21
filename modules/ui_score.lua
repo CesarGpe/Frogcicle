@@ -55,6 +55,7 @@ function ui:draw()
 	love.graphics.setColor(self.time.color.r, self.time.color.g, self.time.color.b, self.time.color.a)
 	love.graphics.print(time, WIDTH / 2, HEIGHT - 536, self.time.angle, self.time.scale, self.time.scale, twidth / 2)
 
+	love.graphics.setColor(1, 1, 1, self.score.color.a)
 	btns.draw()
 
 	talkies.draw()
